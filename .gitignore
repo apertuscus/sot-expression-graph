@@ -1,5 +1,5 @@
 *~
 .*
 doc/*
-../Debug/*
-../_build-*
+Debug/*
+_build-*

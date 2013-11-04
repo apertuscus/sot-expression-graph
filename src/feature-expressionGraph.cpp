@@ -165,7 +165,7 @@ computeJacobian( ml::Matrix& J,int time )
 *a the possible features.
  */
 ml::Vector&
-FeatureExpressionGraph::computeError( ml::Vector& Mvect3,int time )
+FeatureExpressionGraph::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
 
@@ -178,8 +178,7 @@ FeatureExpressionGraph::computeError( ml::Vector& Mvect3,int time )
   sotDEBUG(15) << "w_T_obj = " << w_T_obj << std::endl;
   sotDEBUG(15) << "vd = " << val_desired << std::endl;
 
-  ml::Vector  error;
-  error.resize(1);
+
 
   //copy positions
   for( int i=0;i<3;++i )
@@ -194,14 +193,13 @@ FeatureExpressionGraph::computeError( ml::Vector& Mvect3,int time )
   Soutput->setInputValue(12,val_desired);
 
 
+  res.resize(1);
   //evaluate the result.
-  //error(0)=Soutput->value();
-  //TODO
-  //revert the test
-  error(0)=0;
+  res(0)=Soutput->value();
+
 
   sotDEBUGOUT(15);
-  return error ;
+  return res ;
 }
 
 void FeatureExpressionGraph::
