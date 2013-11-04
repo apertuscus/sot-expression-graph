@@ -10,7 +10,7 @@ INCLUDE(cmake/boost.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/ros.cmake)
 
-SET(PROJECT_NAME sot-gmr)
+SET(PROJECT_NAME sot-expression-graph)
 SET(PROJECT_DESCRIPTION "")
 SET(PROJECT_URL "")
 
