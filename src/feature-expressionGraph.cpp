@@ -50,7 +50,7 @@ FeatureExpressionGraph( const string& ExpressionGraph )
     ,w_T_ee_SIN ( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_ee" )
     ,w_T_obj_SIN( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_obj" )
     ,articularJacobianSIN( NULL,"sotFeatureExpressionGraph("+name+")::input(matrix)::Jq" )
-    ,positionRefSIN( NULL,"sotFeatureExpressionGraph("+name+")::input(vector)::positionRef" )
+    ,positionRefSIN( NULL,"sotFeatureExpressionGraph("+name+")::input(double)::positionRef" )
 {
   //the jacobian depends by
   jacobianSOUT.addDependency( w_T_ee_SIN );
@@ -126,7 +126,7 @@ computeJacobian( ml::Matrix& J,int time )
   const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
   const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
   const ml::Matrix & Jq = articularJacobianSIN(time);
-  const ml::Vector & vectdes = positionRefSIN(time);
+  const double & vectdes = positionRefSIN(time);
   //copy positions
   for( int i=0;i<3;++i )
   {
@@ -137,7 +137,7 @@ computeJacobian( ml::Matrix& J,int time )
   Soutput->setInputValue(3,mlHom2KDLRot(w_T_ee));
   Soutput->setInputValue(9,mlHom2KDLRot(w_T_obj));
   //copy reference
-  Soutput->setInputValue(12,vectdes(0));
+  Soutput->setInputValue(12,vectdes);
 
 
   //evaluate once to update the tree
@@ -172,11 +172,11 @@ FeatureExpressionGraph::computeError( ml::Vector& Mvect3,int time )
 
   const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
   const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
-  const ml::Vector & vectdes = positionRefSIN(time);
+  const double & val_desired = positionRefSIN(time);
 
   sotDEBUG(15) << "w_T_obj = " << w_T_ee << std::endl;
   sotDEBUG(15) << "w_T_obj = " << w_T_obj << std::endl;
-  sotDEBUG(15) << "vd = " << vectdes << std::endl;
+  sotDEBUG(15) << "vd = " << val_desired << std::endl;
 
   ml::Vector  error;
   error.resize(1);
@@ -191,11 +191,14 @@ FeatureExpressionGraph::computeError( ml::Vector& Mvect3,int time )
   Soutput->setInputValue(3,mlHom2KDLRot(w_T_ee));
   Soutput->setInputValue(9,mlHom2KDLRot(w_T_obj));
   //copy reference
-  Soutput->setInputValue(12,vectdes(0));
+  Soutput->setInputValue(12,val_desired);
 
 
   //evaluate the result.
-  error(0)=Soutput->value();
+  //error(0)=Soutput->value();
+  //TODO
+  //revert the test
+  error(0)=0;
 
   sotDEBUGOUT(15);
   return error ;

@@ -93,7 +93,7 @@ class SOTFeatureExpressionGraph_EXPORT FeatureExpressionGraph
   dg::SignalPtr< ml::Matrix,int > articularJacobianSIN;
 
 
-  dg::SignalPtr< ml::Vector,int > positionRefSIN;
+  dg::SignalPtr< double,int > positionRefSIN;
 
   using FeatureAbstract::selectionSIN;
   using FeatureAbstract::jacobianSOUT;
