@@ -34,70 +34,148 @@
 #include <sot/core/matrix-rotation.hh>
 #include <sot/core/vector-utheta.hh>
 #include <sot/core/factory.hh>
+#include <ros/package.h>
 
 using namespace dynamicgraph::sot;
 using namespace std;
 using namespace dynamicgraph;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(featureExpressionFullGraph,"featureExpressionFullGraph");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureExpressionFullGraph,"FeatureExpressionFullGraph");
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
+#define CHECK( a ) \
+		{ bool result = a; \
+		if (!result) { \
+			std::cerr << __FILE__ << " : " << __LINE__ << " : FAILED: " #a << std::endl;\
+			exit(1);\
+		} \
+		}
 
-featureExpressionFullGraph::
-featureExpressionFullGraph( const string& ExpressionGraph )
-  : FeatureAbstract( ExpressionGraph )
-    ,w_T_ee_SIN ( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_ee" )
-    ,w_T_obj_SIN( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_obj" )
-    ,articularJacobianSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrix)::Jq" )
-    ,positionRefSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(double)::positionRef" )
+ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(Context::Ptr ctx)
 {
-  //the jacobian depends by
-  jacobianSOUT.addDependency( w_T_ee_SIN );
-  jacobianSOUT.addDependency( w_T_obj_SIN );
-  jacobianSOUT.addDependency( positionRefSIN );//this one is not probably necessary...
-  jacobianSOUT.addDependency( articularJacobianSIN );
-  //the output depends by
-  jacobianSOUT.addDependency( w_T_ee_SIN );
-  jacobianSOUT.addDependency( w_T_obj_SIN );
-  errorSOUT.addDependency( positionRefSIN );
+	UrdfExpr2 urdf;
+	std::string path_to_file=
+			ros::package::getPath("romeo_description")
+			+"/urdf/romeo_small.urdf";
 
-  signalRegistration( w_T_ee_SIN<<w_T_obj_SIN
-                      <<articularJacobianSIN<<positionRefSIN );
-
-  /***
-   * init of expression graph
-   * */
-  Expression<KDL::Vector>::Ptr w_p_ee=KDL::vector(input(0), input(1),input(2));
-  Expression<KDL::Rotation>::Ptr w_R_ee = inputRot(3);
-  //frame of the robot ee, w.r.t a world frame
-  w_T_ee= frame(w_R_ee,  w_p_ee);
-  Expression<KDL::Vector>::Ptr w_p_obj=KDL::vector(input(6), input(7),input(8));
-  Expression<KDL::Rotation>::Ptr w_R_obj= inputRot(9);
-  //frame of the the object, w.r.t the same world frame
-  w_T_obj=cached<Frame> (frame(w_R_obj,  w_p_obj));
-  //in and out
-  Sreference= input(12);
-  Soutput=cached<double>(Sreference-norm(w_p_ee-w_p_obj));
-  //declare dependecies
-  //copy positions
+	CHECK( urdf.readFromFile(path_to_file));
 
 
-  //end init
+	//addTransform gives a name (first arg.)
+	//  to the transformations between base_link (3° arg.) and the
+	//  left/right gripper tool frames ("second arg")
+
+	CHECK( urdf.addTransform("left_hand","l_wrist","l_sole")  );
+	//CHECK( urdf.addTransform("right_hand","r_wrist","l_sole")  );
+
+	//adding transformation for all the kinematic tree, so that all the joints are added
+	ExpressionMap r = urdf.getExpressions(ctx);
+
+	return r;
+}
+
+/* * this function creates a vector of indexes from
+ *  the map name_joints (the ordered list of joint of stack of task)
+ *  to a list of joints that are in the Context.
+ *  */
+std::vector<int> FeatureExpressionFullGraph::index_lookup_table
+(const Context::Ptr ctx, const std::string name_joints[],const int n_of_joints)
+{
+	std::vector<int> jointndx;
+	for (int i=0;i<n_of_joints; ++i) {
+		int nr = ctx->getScalarNdx(name_joints[i]);
+		if (nr==-1) //none of the relations depends on the transformations defined
+		{
+			cout<< nr <<"\t"<< name_joints[i] << "  Not Found"  << endl;
+		}
+		else
+		{
+			jointndx.push_back(nr);
+			cout<< nr <<"\t"<< name_joints[i] << "  saved in position\t"  <<jointndx.size()		<< endl;
+		}
+	}
+	return jointndx;
 }
 
 
+Expression<double>::Ptr FeatureExpressionFullGraph::distance_btw_origins
+	(Expression<KDL::Frame>::Ptr o1,Expression<KDL::Frame>::Ptr o2)
+{
+	Expression<double>::Ptr d=norm(origin(o1)-origin(o2));
+	return d;
+}
+
+
+FeatureExpressionFullGraph::
+FeatureExpressionFullGraph( const string& ExpressionGraph )
+: FeatureAbstract( ExpressionGraph )
+,jointSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(vector)::joint" )
+//,w_T_ee_SIN ( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_ee" )
+,w_T_obj_SIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrixHomo)::position_obj" )
+//,articularJacobianSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrix)::Jq" )
+,positionRefSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(double)::positionRef" )
+{
+
+	//the jacobian depends by
+	  errorSOUT.addDependency( jointSIN );
+	//jacobianSOUT.addDependency( w_T_ee_SIN );
+	jacobianSOUT.addDependency( w_T_obj_SIN );
+	jacobianSOUT.addDependency( positionRefSIN );//this one is not probably necessary...
+	//jacobianSOUT.addDependency( articularJacobianSIN );
+	//the output depends by
+	//jacobianSOUT.addDependency( w_T_ee_SIN );
+	jacobianSOUT.addDependency( w_T_obj_SIN );
+	errorSOUT.addDependency( positionRefSIN );
+
+	//signalRegistration(  jointSIN<<w_T_ee_SIN<<w_T_obj_SIN<<articularJacobianSIN<<positionRefSIN );
+	signalRegistration(jointSIN<<w_T_obj_SIN<<positionRefSIN );
+
+	/***
+	 * init of expression graph
+	 * */
+	Context::Ptr ctx = create_context();
+	ctx->addType("robot");
+
+	ExpressionMap r=create_fk_from_urdf(ctx);
+
+	//build up index table
+	ind_to_sot=index_lookup_table(ctx,name_joints_sot_order ,N_OF_JOINTS);
+
+	//save the initial position for saving data that are not joint values (e.g. external frame, input)
+	//TODO this stuff should be substituted by variable type.
+	st_ind_ex=ind_to_sot.size();
+	q_ex.resize(st_ind_ex,0);
+
+	//frame of the robot ee, w.r.t a world frame
+	w_T_ee=r["left_hand"];
+	Expression<KDL::Vector>::Ptr w_p_obj=KDL::vector(
+			input(st_ind_ex),
+			input(st_ind_ex+1),
+			input(st_ind_ex+2));
+	Expression<KDL::Rotation>::Ptr w_R_obj= inputRot(st_ind_ex+3);
+	//frame of the the object, w.r.t the same world frame
+	w_T_obj=cached<Frame> (frame(w_R_obj,  w_p_obj));
+	//in and out
+	Sreference= input(st_ind_ex+6);
+	//Soutput=cached<double>(Sreference-norm(origin(w_T_ee)-origin(w_T_obj)));
+
+	Soutput=cached<double>(Sreference-distance_btw_origins(w_T_ee,w_T_obj));
+}
+
+
+
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-unsigned int& featureExpressionFullGraph::
+unsigned int& FeatureExpressionFullGraph::
 getDimension( unsigned int & dim, int /*time*/ )
 {
-  sotDEBUG(25)<<"# In {"<<endl;
+	sotDEBUG(25)<<"# In {"<<endl;
 
-  return dim=1;
+	return dim=1;
 }
 
 
@@ -108,112 +186,125 @@ getDimension( unsigned int & dim, int /*time*/ )
  */
 
 
-ml::Matrix& featureExpressionFullGraph::
+ml::Matrix& FeatureExpressionFullGraph::
 computeJacobian( ml::Matrix& J,int time )
 {
-  sotDEBUG(15)<<"# In {"<<endl;
+	sotDEBUG(15)<<"# In {"<<endl;
 
-  //read signals!
-  const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
-  const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
-  const ml::Matrix & Jq = articularJacobianSIN(time);
-  const double & vectdes = positionRefSIN(time);
-  //copy positions
-  for( int i=0;i<3;++i )
-  {
-	  Soutput->setInputValue(i,w_T_ee.elementAt( i,3 ));
-	  Soutput->setInputValue(i+6, w_T_obj.elementAt( i,3 ));
-  }
-  //copy rotations
-  //TODO use variable type for not controllable objects
-  Soutput->setInputValue(3,mlHom2KDLRot(w_T_ee));
-  Soutput->setInputValue(9,mlHom2KDLRot(w_T_obj));
-  //copy reference
-  Soutput->setInputValue(12,vectdes);
+	//read signals!
+	//const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
+	const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
+	//const ml::Matrix & Jq = articularJacobianSIN(time);
+	const double & pos_des = positionRefSIN(time);
+	const ml::Vector q_sot = jointSIN(time);
 
+	//copy angles in the vector for the relation
+	for (unsigned int i=0;i<st_ind_ex;i++)
+	{
+		q_ex[i]=q_sot(ind_to_sot[i]);
+	}
 
-  //evaluate once to update the tree
-  Soutput->value();
+	Soutput->setInputValues(q_ex);
 
-  //resize the matrices
-  J.resize(1,Jq.nbCols());
-  ml::Matrix Jtask(1,6);
+	//TODO use variable type for not controllable objects
+	//copy object pose and external output
+	for( int i=0;i<3;++i )
+		Soutput->setInputValue(st_ind_ex+i, w_T_obj.elementAt( i,3 ));
+	Soutput->setInputValue(st_ind_ex+3,mlHom2KDLRot(w_T_obj));
+	//copy reference
+	Soutput->setInputValue(st_ind_ex+7,pos_des);
 
 
-  //compute the interaction matrix
+	//evaluate once to update the tree
+	Soutput->value();
 
-  for (int i=0;i<6;++i)
-	  Jtask(0,i)=Soutput->derivative(i);
+	//resize the matrices
+	//J.resize(1,N_OF_JOINTS);//todo jonit are 39 not 37
 
-  //multiplication!
-  J=Jtask*Jq;
+	J.resize(1,39);
 
-//return result
-  sotDEBUG(15)<<"# Out }"<<endl;
-  return J;
+	/*
+	 * compute the Jacobian starting to a zero matrix,
+	 * 	i fill in only the lines that are referred in the index map
+	 * 	*/
+	J.setZero();
+	for (int i=0;i<st_ind_ex;++i)
+		J(0,ind_to_sot[i])=Soutput->derivative(i);
+
+
+
+	//return result
+	sotDEBUG(15)<<"# Out }"<<endl;
+	return J;
 }
 
 /** Compute the error between two visual features from a subset
-*a the possible features.
+ *a the possible features.
  */
 ml::Vector&
-featureExpressionFullGraph::computeError( ml::Vector& res,int time )
+FeatureExpressionFullGraph::computeError( ml::Vector& res,int time )
 {
-  sotDEBUGIN(15);
+	sotDEBUGIN(15);
 
 
-  const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
-  const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
-  const double & val_desired = positionRefSIN(time);
+	//read signals!
+	//const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
+	const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
+	//const ml::Matrix & Jq = articularJacobianSIN(time);
+	const double & pos_des = positionRefSIN(time);
+	const ml::Vector q_sot = jointSIN(time);
+	//cout<< "q_sot.size(): "<<q_sot.size()<<endl;
+	//cout<< "q_ex.size(): "<<q_ex.size()<<endl;
+	//cout<< "st_ind_ex: "<<st_ind_ex<<endl;
+	//copy angles in the vector for the relation
+	for (unsigned int i=0;i<st_ind_ex;i++)
+	{
+		q_ex[i]=q_sot(ind_to_sot[i]);
+		//cerr<<"accessing: "<<ind_to_sot[i]<<endl;
+	}
 
-  sotDEBUG(15) << "w_T_obj = " << w_T_ee << std::endl;
-  sotDEBUG(15) << "w_T_obj = " << w_T_obj << std::endl;
-  sotDEBUG(15) << "vd = " << val_desired << std::endl;
+	Soutput->setInputValues(q_ex);
+
+	//TODO use variable type for not controllable objects
+	//copy object pose and external output
+	for( int i=0;i<3;++i )
+		Soutput->setInputValue(st_ind_ex+i, w_T_obj.elementAt( i,3 ));
+	Soutput->setInputValue(st_ind_ex+3,mlHom2KDLRot(w_T_obj));
+	//copy reference
+	Soutput->setInputValue(st_ind_ex+7,pos_des);
 
 
 
-  //copy positions
-  for( int i=0;i<3;++i )
-  {
-	  Soutput->setInputValue(i,w_T_ee.elementAt( i,3 ));
-	  Soutput->setInputValue(i+6, w_T_obj.elementAt( i,3 ));
-  }
-  //copy rotations
-  Soutput->setInputValue(3,mlHom2KDLRot(w_T_ee));
-  Soutput->setInputValue(9,mlHom2KDLRot(w_T_obj));
-  //copy reference
-  Soutput->setInputValue(12,val_desired);
+	// resize the result vector and
+	res.resize(1);
+	//evaluate the result.
+	res(0)=Soutput->value();
 
 
-  res.resize(1);
-  //evaluate the result.
-  res(0)=Soutput->value();
-
-
-  sotDEBUGOUT(15);
-  return res ;
+	sotDEBUGOUT(15);
+	return res ;
 }
 
-void featureExpressionFullGraph::
+void FeatureExpressionFullGraph::
 display( std::ostream& os ) const
 {
-  os <<"featureExpressionFullGraph <"<<name<<">";
+	os <<"featureExpressionFullGraph <"<<name<<">";
 }
 
 
 
-void featureExpressionFullGraph::
+void FeatureExpressionFullGraph::
 commandLine( const std::string& cmdLine,
-	     std::istringstream& cmdArgs,
-	     std::ostream& os )
+		std::istringstream& cmdArgs,
+		std::ostream& os )
 {
-  if( cmdLine=="help" )
-    {
-      os << "featureExpressionFullGraph: "<<endl;
-      Entity::commandLine( cmdLine,cmdArgs,os );
-    }
-  else  //FeatureAbstract::
-    Entity::commandLine( cmdLine,cmdArgs,os );
+	if( cmdLine=="help" )
+	{
+		os << "featureExpressionFullGraph: "<<endl;
+		Entity::commandLine( cmdLine,cmdArgs,os );
+	}
+	else  //FeatureAbstract::
+		Entity::commandLine( cmdLine,cmdArgs,os );
 
 }
 

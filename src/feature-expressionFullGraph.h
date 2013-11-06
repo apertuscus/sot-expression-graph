@@ -34,6 +34,7 @@
 #include <kdl/expressiontree.hpp>
 #include <expressiongraph_tf/context.hpp>
 #include <expressiongraph_tf/urdfexpressions2.hpp>
+#include <expressiongraph_tf/urdfexpressions2.hpp>
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
@@ -58,63 +59,73 @@ namespace dg = dynamicgraph;
 /*!
   \class featureExpressionFullGraph
   \brief Class that defines example of expression graps
-*/
-class SOTfeatureExpressionFullGraph_EXPORT featureExpressionFullGraph
+ */
+class SOTfeatureExpressionFullGraph_EXPORT FeatureExpressionFullGraph
 : public FeatureAbstract
-{
+  {
 
 
- public:
-  static const std::string CLASS_NAME;
-  virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+public:
+	static const std::string CLASS_NAME;
+	virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
-  DECLARE_NO_REFERENCE;
+	DECLARE_NO_REFERENCE;
 
-  /*variables for expression graphs */
-  Expression<KDL::Frame>::Ptr w_T_ee;
-  Expression<KDL::Frame>::Ptr w_T_obj;
-  Expression<double>::Ptr Soutput;
-  Expression<double>::Ptr Sreference;
-  //end
+	/*variables for expression graphs */
+	Expression<KDL::Frame>::Ptr w_T_ee;
+	Expression<KDL::Frame>::Ptr w_T_obj;
+	Expression<double>::Ptr Soutput;
+	Expression<double>::Ptr Sreference;
+	std::vector<int> ind_to_sot;
+	unsigned int st_ind_ex;
+	std::vector<double> q_ex;
+	//end
 
- protected:
+protected:
 
-  /* --- SIGNALS ------------------------------------------------------------ */
- public:
- // dg::SignalPtr< ml::Vector,int > vectorSIN;//what is that for?
+	/* --- SIGNALS ------------------------------------------------------------ */
+public:
+	// joint angles
+	dg::SignalPtr< ml::Vector,int > jointSIN;
+	//pose of the robot end effector
+	//dg::SignalPtr< MatrixHomogeneous,int > w_T_ee_SIN;
 
-  //pose of the robot end effector
-  dg::SignalPtr< MatrixHomogeneous,int > w_T_ee_SIN;
+	//pose of the object
+	dg::SignalPtr< MatrixHomogeneous,int > w_T_obj_SIN;
 
-  //pose of the object
-  dg::SignalPtr< MatrixHomogeneous,int > w_T_obj_SIN;
-
-  //robot jacobian w_J_ee
-  dg::SignalPtr< ml::Matrix,int > articularJacobianSIN;
+	//robot jacobian w_J_ee
+	//dg::SignalPtr< ml::Matrix,int > articularJacobianSIN;
 
 
-  dg::SignalPtr< double,int > positionRefSIN;
+	dg::SignalPtr< double,int > positionRefSIN;
 
-  using FeatureAbstract::selectionSIN;
-  using FeatureAbstract::jacobianSOUT;
-  using FeatureAbstract::errorSOUT;
+	using FeatureAbstract::selectionSIN;
+	using FeatureAbstract::jacobianSOUT;
+	using FeatureAbstract::errorSOUT;
 
- public:
-  featureExpressionFullGraph( const std::string& name );
-  virtual ~featureExpressionFullGraph( void ) {}
+	ExpressionMap create_fk_from_urdf(Context::Ptr ctx);
+	Expression<double>::Ptr distance_btw_origins
+		(Expression<KDL::Frame>::Ptr o1,Expression<KDL::Frame>::Ptr o2);
+	std::vector<int> index_lookup_table
+			(const Context::Ptr ctx,
+			 const std::string name_joints[],const int n_of_joints);
 
-  virtual unsigned int& getDimension( unsigned int & dim, int time );
+public:
+	FeatureExpressionFullGraph( const std::string& name );
+	virtual ~FeatureExpressionFullGraph( void ) {}
 
-  virtual ml::Vector& computeError( ml::Vector& res,int time );
-  virtual ml::Matrix& computeJacobian( ml::Matrix& res,int time );
+	virtual unsigned int& getDimension( unsigned int & dim, int time );
 
-  virtual void display( std::ostream& os ) const;
+	virtual ml::Vector& computeError( ml::Vector& res,int time );
+	virtual ml::Matrix& computeJacobian( ml::Matrix& res,int time );
 
-  virtual void commandLine( const std::string& cmdLine,
-			    std::istringstream& cmdArgs,
-			    std::ostream& os );
+	virtual void display( std::ostream& os ) const;
 
-} ;
+	virtual void commandLine( const std::string& cmdLine,
+			std::istringstream& cmdArgs,
+			std::ostream& os );
+
+  } ;
 
 } /* namespace sot */} /* namespace dynamicgraph */
 

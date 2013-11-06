@@ -56,7 +56,7 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.expression_graph.expression_graph import *
 
-expg = FeatureExpressionGraph('expg')
+expg = FeatureExpressionFullGraph('expg')
 expg.displaySignals()
 
 
@@ -67,10 +67,11 @@ taskExpg = Task('taskExpg')
 taskExpg.controlGain.value = 1
 
 # operational point used
-opPoint = 'left-wrist'
+#opPoint = 'left-wrist'
 # Get the position/Jacobian of the operational point for the dynamic entity
-plug(robot.dynamic.signal(opPoint),expg.signal('position_ee'))
-plug(robot.dynamic.signal('J'+opPoint),expg.signal('Jq'))
+#plug(robot.dynamic.signal(opPoint),expg.signal('position_ee'))
+#plug(robot.dynamic.signal('J'+opPoint),expg.signal('Jq'))
+plug(robot.dynamic.signal('position'),expg.signal('joint'))
 
 # Associate the feature to the task:
 taskExpg.add(expg.name)
@@ -98,4 +99,12 @@ expg.positionRef.value = 0
 solver.push(taskExpg)
 
 expg.displaySignals()
+
+# expg.error.recompute(1)
+# expg.error.value
+# expg.jacobian.recompute(1)
+# expg.jacobian.value
+# go
+#
+
 
