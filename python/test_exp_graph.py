@@ -56,7 +56,7 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.expression_graph.expression_graph import *
 
-expg = FeatureExpressionGraph('expg')
+expg = featureExpressionFullGraph('expg')
 expg.displaySignals()
 
 

@@ -1,9 +1,9 @@
 /*
- * Copyright 2010,
- * François Bleibel,
- * Olivier Stasse,
+ * Copyright 2013,
+ * Gianni Borghesan
  *
- * CNRS/AIST
+ *	KULEUVEN
+ *
  *
  * This file is part of sot-core.
  * sot-core is free software: you can redistribute it and/or
@@ -26,7 +26,7 @@
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
-#include "feature-expressionGraph.h"
+#include "feature-expressionFullGraph.h"
 #include "helper.h"
 #include <sot/core/exception-feature.hh>
 
@@ -39,19 +39,19 @@ using namespace dynamicgraph::sot;
 using namespace std;
 using namespace dynamicgraph;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureExpressionGraph,"FeatureExpressionGraph");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(featureExpressionFullGraph,"featureExpressionFullGraph");
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-FeatureExpressionGraph::
-FeatureExpressionGraph( const string& ExpressionGraph )
+featureExpressionFullGraph::
+featureExpressionFullGraph( const string& ExpressionGraph )
   : FeatureAbstract( ExpressionGraph )
     ,w_T_ee_SIN ( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_ee" )
     ,w_T_obj_SIN( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_obj" )
-    ,articularJacobianSIN( NULL,"sotFeatureExpressionGraph("+name+")::input(matrix)::Jq" )
-    ,positionRefSIN( NULL,"sotFeatureExpressionGraph("+name+")::input(double)::positionRef" )
+    ,articularJacobianSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrix)::Jq" )
+    ,positionRefSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(double)::positionRef" )
 {
   //the jacobian depends by
   jacobianSOUT.addDependency( w_T_ee_SIN );
@@ -92,7 +92,7 @@ FeatureExpressionGraph( const string& ExpressionGraph )
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-unsigned int& FeatureExpressionGraph::
+unsigned int& featureExpressionFullGraph::
 getDimension( unsigned int & dim, int /*time*/ )
 {
   sotDEBUG(25)<<"# In {"<<endl;
@@ -107,7 +107,8 @@ getDimension( unsigned int & dim, int /*time*/ )
  * the possible features.
  */
 
-ml::Matrix& FeatureExpressionGraph::
+
+ml::Matrix& featureExpressionFullGraph::
 computeJacobian( ml::Matrix& J,int time )
 {
   sotDEBUG(15)<<"# In {"<<endl;
@@ -156,7 +157,7 @@ computeJacobian( ml::Matrix& J,int time )
 *a the possible features.
  */
 ml::Vector&
-FeatureExpressionGraph::computeError( ml::Vector& res,int time )
+featureExpressionFullGraph::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
 
@@ -193,22 +194,22 @@ FeatureExpressionGraph::computeError( ml::Vector& res,int time )
   return res ;
 }
 
-void FeatureExpressionGraph::
+void featureExpressionFullGraph::
 display( std::ostream& os ) const
 {
-  os <<"FeatureExpressionGraph <"<<name<<">";
+  os <<"featureExpressionFullGraph <"<<name<<">";
 }
 
 
 
-void FeatureExpressionGraph::
+void featureExpressionFullGraph::
 commandLine( const std::string& cmdLine,
 	     std::istringstream& cmdArgs,
 	     std::ostream& os )
 {
   if( cmdLine=="help" )
     {
-      os << "FeatureExpressionGraph: "<<endl;
+      os << "featureExpressionFullGraph: "<<endl;
       Entity::commandLine( cmdLine,cmdArgs,os );
     }
   else  //FeatureAbstract::

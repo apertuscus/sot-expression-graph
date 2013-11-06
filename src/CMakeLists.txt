@@ -10,19 +10,28 @@ SET(CONTROLLER_NAME expression_graph)
 ADD_LIBRARY(${CONTROLLER_NAME}
   SHARED
   feature-expressionGraph.cpp
+  feature-expressionFullGraph.cpp
+  helper.cpp
 )
+
 
 # Link the dynamic library containing the SoT with its dependencies.
 PKG_CONFIG_USE_DEPENDENCY(${CONTROLLER_NAME} "dynamic-graph")
 PKG_CONFIG_USE_DEPENDENCY(${CONTROLLER_NAME} "dynamic-graph-python")
 PKG_CONFIG_USE_DEPENDENCY(${CONTROLLER_NAME} "sot-core")
-
+#external package 
 ROSPACK_USE_DEPENDENCY(${CONTROLLER_NAME} "expressiongraph")
-
+ROSPACK_USE_DEPENDENCY(${CONTROLLER_NAME} "expressiongraph_tf")
+#GIANNI
+#ADD_LIBRARY(helper helper)
+#ROSPACK_USE_DEPENDENCY(helper "expressiongraph")
+#PKG_CONFIG_USE_DEPENDENCY(helper "sot-core")
+#TARGET_LINK_LIBRARIES(${CONTROLLER_NAME} helper)
 
 IF(UNIX AND NOT APPLE)
   TARGET_LINK_LIBRARIES(${CONTROLLER_NAME} ${Boost_LIBRARIES})
 ENDIF(UNIX AND NOT APPLE)
+
 
 INSTALL(TARGETS ${CONTROLLER_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
@@ -32,6 +41,7 @@ SET(NEW_ENTITY_CLASS ${ENTITIES})
 DYNAMIC_GRAPH_PYTHON_MODULE("sot/expression_graph/${PYTHON_LIBRARY_NAME}"
   ${CONTROLLER_NAME}
   feature-expressionGraph-${PYTHON_LIBRARY_NAME}-wrap
+  feature-expressionFullGraph-${PYTHON_LIBRARY_NAME}-wrap
   )
 
 
