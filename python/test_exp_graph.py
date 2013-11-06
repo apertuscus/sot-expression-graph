@@ -1,3 +1,9 @@
+import roslib
+import rospy
+import tf
+import numpy
+
+
 
 ## Create the robot and the solver. only useful to test the whole system.
 #example to check pytohn binding
@@ -14,6 +20,7 @@ ros = Ros(robot)
 # Create a simple kinematic solver.
 from dynamic_graph.sot.application.velocity.precomputed_tasks import initialize
 solver = initialize ( robot )
+
 
 
 #-------------------------------------------------------------------------------
@@ -75,10 +82,15 @@ taskExpg.add(expg.name)
 #  (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
 #  (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   0.724250138032145),
 #  (0.0, 0.0, 0.0, 1.0))
-expg.position_obj.value = ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.3),
+m1= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.3),
  (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
  (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
  (0.0, 0.0, 0.0, 1.0))
+m2= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.1),
+ (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
+ (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
+ (0.0, 0.0, 0.0, 1.0))
+expg.position_obj.value = m1
 expg.positionRef.value = 0
 
 # add the task corresponding to the expression graph.

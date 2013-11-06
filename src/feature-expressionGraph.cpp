@@ -134,6 +134,7 @@ computeJacobian( ml::Matrix& J,int time )
 	  Soutput->setInputValue(i+6, w_T_obj.elementAt( i,3 ));
   }
   //copy rotations
+  //TODO use variable type for not controllable objects
   Soutput->setInputValue(3,mlHom2KDLRot(w_T_ee));
   Soutput->setInputValue(9,mlHom2KDLRot(w_T_obj));
   //copy reference
