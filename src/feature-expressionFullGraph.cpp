@@ -92,8 +92,8 @@ std::vector<int> FeatureExpressionFullGraph::index_lookup_table
 		}
 		else
 		{
-			jointndx.push_back(nr);
-			cout<< nr <<"\t"<< name_joints[i] << "  saved in position\t"  <<jointndx.size()		<< endl;
+			jointndx.push_back(i);
+			cout<< i <<"\t"<< name_joints[i] << "  saved in position\t"  <<jointndx.size()	- 1 << endl;
 		}
 	}
 	return jointndx;

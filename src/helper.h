@@ -8,6 +8,12 @@ KDL::Rotation mlHom2KDLRot (const MatrixHomogeneous &  M);
 
 
 const std::string name_joints_sot_order[] ={
+		 "Waist_X",
+		 "Waist_Y",
+		 "Waist_Z",
+		 "Waist_Phi",
+		 "Waist_Theta",
+		 "Waist_Psi",
 		 "TrunkYaw",
 		 "NeckYaw",
 		 "NeckPitch",
@@ -40,13 +46,9 @@ const std::string name_joints_sot_order[] ={
 		 "RKneePitch",
 		 "RAnklePitch",
 		 "RAnkleRoll",
-		 "RToePitch",
-		 "LEyeYaw",
-		 "LEyePitch",
-		 "REyeYaw",
-		 "REyePitch"
+		 "RToePitch"
 };
-#define N_OF_JOINTS 37
+#define N_OF_JOINTS 39
 
 #endif
 
