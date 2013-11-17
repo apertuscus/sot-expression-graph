@@ -3,3 +3,4 @@
 doc/*
 Debug/*
 _build-*
+cmake/*
