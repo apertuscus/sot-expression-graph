@@ -159,9 +159,11 @@ FeatureExpressionFullGraph( const string& ExpressionGraph )
 	w_T_obj=cached<Frame> (frame(w_R_obj,  w_p_obj));
 	//in and out
 	Sreference= input(st_ind_ex+6);
-	//Soutput=cached<double>(Sreference-norm(origin(w_T_ee)-origin(w_T_obj)));
 
-	Soutput=cached<double>(Sreference-distance_btw_origins(w_T_ee,w_T_obj));
+	geometric_primitive::point p1{w_T_obj,Constant(Vector(0,0,0))};
+	geometric_primitive::point p2{w_T_ee,Constant(Vector(0,0,0))};
+	Soutput=geometric_primitive::point_point_distance(p1,p2);
+
 }
 
 

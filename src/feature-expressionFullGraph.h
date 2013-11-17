@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2010,
  * ,
@@ -34,7 +35,7 @@
 #include <kdl/expressiontree.hpp>
 #include <expressiongraph_tf/context.hpp>
 #include <expressiongraph_tf/urdfexpressions2.hpp>
-#include <expressiongraph_tf/urdfexpressions2.hpp>
+
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
