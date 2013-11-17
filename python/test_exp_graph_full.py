@@ -69,7 +69,6 @@ taskExpg.controlGain.value = 1
 # operational point used
 #opPoint = 'left-wrist'
 # Get the position/Jacobian of the operational point for the dynamic entity
-#plug(robot.dynamic.signal(opPoint),expg.signal('position_ee'))
 #plug(robot.dynamic.signal('J'+opPoint),expg.signal('Jq'))
 plug(robot.dynamic.signal('position'),expg.signal('joint'))
 
@@ -83,28 +82,62 @@ taskExpg.add(expg.name)
 #  (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
 #  (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   0.724250138032145),
 #  (0.0, 0.0, 0.0, 1.0))
-m1= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.3),
- (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
- (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
- (0.0, 0.0, 0.0, 1.0))
-m2= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.1),
- (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
- (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
- (0.0, 0.0, 0.0, 1.0))
-expg.position_obj.value = m1
+#m1= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.3),
+# (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
+# (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
+# (0.0, 0.0, 0.0, 1.0))
+#m2= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.1),
+# (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
+# (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
+# (0.0, 0.0, 0.0, 1.0))
+
+# initial position of the SoT.
+#m3= (( 0.753093576084,  -0.379978278315,   0.537090843033,   0.103286699113),
+#     (-0.248711481396,   0.591351373490,   0.767102439113,   0.242538553502),
+#     (-0.609091671821,  -0.711280578310,   0.350837960086,   0.724250138032),
+#     (              0,                0,                0,   1.000000000000))
+
+
+#m3= (( 0.892233,   0.0545103,    0.448274, 0.229927),
+#     ( 0.00330451,  0.991873,   -0.127189, -0.0126188),
+#     ( -0.451564,   0.114964,    0.884801, 0.307811),
+#     (              0,                0,                0,   1.000000000000))
+
+
+m3= ((1,0,0,   0.010260575628),
+     (0,1,0,  -0.096000000000),
+     (0,0,1,  -0.106999500724),
+     (0,0,0,   1.000000000000))
+
+expg.position_obj.value = m3
+#expg.position_obj.value = robot.rightAnkle.position.value
 expg.positionRef.value = 0
 
 # add the task corresponding to the expression graph.
 # note that the contacts have already been added (to have having a flying robot).
+#solver.sot.clear()
 solver.push(taskExpg)
 
 expg.displaySignals()
 
 # expg.error.recompute(1)
-# expg.error.value
 # expg.jacobian.recompute(1)
 # expg.jacobian.value
 # go
+# expg.error.value
 #
+
+from dynamic_graph.sot.core import Multiply_of_matrixHomo
+
+# Express the desired position in the chosen frame.
+invRefFrame = Inverse_of_matrixHomo("invRefFrame")
+plug(robot.leftAnkle.position, invRefFrame.sin)
+
+multHomo = Multiply_of_matrixHomo("multHomo")
+plug(invRefFrame.sout, multHomo.sin1)
+multHomo.sin2.value = m3
+plug(multHomo.sout, expg.position_obj)
+
+expg.setChain("b2l", "r_ankle", "l_ankle")
 
 
