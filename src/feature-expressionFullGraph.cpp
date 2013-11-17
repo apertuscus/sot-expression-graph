@@ -29,6 +29,7 @@
 #include "feature-expressionFullGraph.h"
 #include "helper.h"
 #include <sot/core/exception-feature.hh>
+#include <dynamic-graph/all-commands.h>
 
 #include <sot/core/matrix-homogeneous.hh>
 #include <sot/core/matrix-rotation.hh>
@@ -53,7 +54,17 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureExpressionFullGraph,"FeatureExpression
 		} \
 		}
 
-ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(Context::Ptr ctx)
+template <class T>
+void print (const std::vector<T> & v)
+{
+	for (unsigned i=0; i<v.size(); ++i)
+		std::cout << v[i] << "  ";
+	std::cout << std::endl;
+}
+
+ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(
+		Context::Ptr ctx, const std::string & op1,
+		const std::string & op2, const std::string & label)
 {
 	UrdfExpr2 urdf;
 	std::string path_to_file=
@@ -67,7 +78,8 @@ ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(Context::Ptr ctx)
 	//  to the transformations between base_link (3° arg.) and the
 	//  left/right gripper tool frames ("second arg")
 
-	CHECK( urdf.addTransform("left_hand","l_wrist","l_sole")  );
+//	CHECK( urdf.addTransform("head","gaze","base")  );
+	CHECK( urdf.addTransform(label, op1, op2)  );
 	//CHECK( urdf.addTransform("right_hand","r_wrist","l_sole")  );
 
 	//adding transformation for all the kinematic tree, so that all the joints are added
@@ -112,36 +124,43 @@ FeatureExpressionFullGraph::
 FeatureExpressionFullGraph( const string& ExpressionGraph )
 : FeatureAbstract( ExpressionGraph )
 ,jointSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(vector)::joint" )
-//,w_T_ee_SIN ( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_ee" )
+//,w_T_ee_SIN( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::position_ee" )
 ,w_T_obj_SIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrixHomo)::position_obj" )
 //,articularJacobianSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrix)::Jq" )
 ,positionRefSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(double)::positionRef" )
 {
 
 	//the jacobian depends by
-	  errorSOUT.addDependency( jointSIN );
-	//jacobianSOUT.addDependency( w_T_ee_SIN );
+	errorSOUT.addDependency( jointSIN );
+	//jacobianSOUT.addDependency(w_T_ee_SIN);
 	jacobianSOUT.addDependency( w_T_obj_SIN );
 	jacobianSOUT.addDependency( positionRefSIN );//this one is not probably necessary...
 	//jacobianSOUT.addDependency( articularJacobianSIN );
 	//the output depends by
-	//jacobianSOUT.addDependency( w_T_ee_SIN );
+	//jacobianSOUT.addDependency(w_T_ee_SIN);
 	jacobianSOUT.addDependency( w_T_obj_SIN );
 	errorSOUT.addDependency( positionRefSIN );
 
-	//signalRegistration(  jointSIN<<w_T_ee_SIN<<w_T_obj_SIN<<articularJacobianSIN<<positionRefSIN );
+	//signalRegistration(  jointSIN<<<<w_T_obj_SIN<<articularJacobianSIN<<positionRefSIN );
 	signalRegistration(jointSIN<<w_T_obj_SIN<<positionRefSIN );
 
 	/***
 	 * init of expression graph
 	 * */
-	Context::Ptr ctx = create_context();
-	ctx->addType("robot");
+	ctx_ = create_context();
+	ctx_->addType("robot");
 
-	ExpressionMap r=create_fk_from_urdf(ctx);
+	// ...
+	initCommands();
+}
+
+void FeatureExpressionFullGraph::setChain
+(const std::string & label, const std::string & op1, const std::string & op2)
+{
+	ExpressionMap expr_map=create_fk_from_urdf(ctx_, op1, op2, label);
 
 	//build up index table
-	ind_to_sot=index_lookup_table(ctx,name_joints_sot_order ,N_OF_JOINTS);
+	ind_to_sot=index_lookup_table(ctx_,name_joints_sot_order ,N_OF_JOINTS);
 
 	//save the initial position for saving data that are not joint values (e.g. external frame, input)
 	//TODO this stuff should be substituted by variable type.
@@ -149,7 +168,7 @@ FeatureExpressionFullGraph( const string& ExpressionGraph )
 	q_ex.resize(st_ind_ex,0);
 
 	//frame of the robot ee, w.r.t a world frame
-	w_T_ee=r["left_hand"];
+	w_T_ee = expr_map[label];
 	Expression<KDL::Vector>::Ptr w_p_obj=KDL::vector(
 			input(st_ind_ex),
 			input(st_ind_ex+1),
@@ -194,17 +213,13 @@ computeJacobian( ml::Matrix& J,int time )
 	sotDEBUG(15)<<"# In {"<<endl;
 
 	//read signals!
-	//const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
 	const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
-	//const ml::Matrix & Jq = articularJacobianSIN(time);
 	const double & pos_des = positionRefSIN(time);
-	const ml::Vector q_sot = jointSIN(time);
+	const ml::Vector & q_sot = jointSIN(time);
 
 	//copy angles in the vector for the relation
 	for (unsigned int i=0;i<st_ind_ex;i++)
-	{
 		q_ex[i]=q_sot(ind_to_sot[i]);
-	}
 
 	Soutput->setInputValues(q_ex);
 
@@ -219,9 +234,6 @@ computeJacobian( ml::Matrix& J,int time )
 
 	//evaluate once to update the tree
 	Soutput->value();
-
-	//resize the matrices
-	//J.resize(1,N_OF_JOINTS);//todo jonit are 39 not 37
 
 	J.resize(1,39);
 
@@ -248,23 +260,21 @@ FeatureExpressionFullGraph::computeError( ml::Vector& res,int time )
 {
 	sotDEBUGIN(15);
 
-
 	//read signals!
-	//const MatrixHomogeneous &  w_T_ee=  w_T_ee_SIN (time);
+	//const MatrixHomogeneous &  w_T_eeReal= w_T_ee_SIN  (time);
 	const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
 	//const ml::Matrix & Jq = articularJacobianSIN(time);
 	const double & pos_des = positionRefSIN(time);
-	const ml::Vector q_sot = jointSIN(time);
+	const ml::Vector & q_sot = jointSIN(time);
 	//cout<< "q_sot.size(): "<<q_sot.size()<<endl;
 	//cout<< "q_ex.size(): "<<q_ex.size()<<endl;
 	//cout<< "st_ind_ex: "<<st_ind_ex<<endl;
 	//copy angles in the vector for the relation
 	for (unsigned int i=0;i<st_ind_ex;i++)
-	{
 		q_ex[i]=q_sot(ind_to_sot[i]);
-		//cerr<<"accessing: "<<ind_to_sot[i]<<endl;
-	}
 
+//	std::cout << " q_ex ";
+//	print(q_ex);
 	Soutput->setInputValues(q_ex);
 
 	//TODO use variable type for not controllable objects
@@ -283,34 +293,42 @@ FeatureExpressionFullGraph::computeError( ml::Vector& res,int time )
 	res(0)=Soutput->value();
 
 
+//	std::cout << " w_T_eeReal  " << w_T_eeReal << std::endl;
+//	std::cout << " w_T_ee  " << w_T_ee->value() << std::endl;
+//	std::cout << " w_T_obj " << w_T_obj << std::endl;
+//	std::cout << std::endl;
+//	std::cout << "Res " << res(0) << std::endl;
 	sotDEBUGOUT(15);
 	return res ;
 }
 
-void FeatureExpressionFullGraph::
-display( std::ostream& os ) const
+//void FeatureExpressionFullGraph::defineOperationalPoints(
+//		const std::string & op1, const std::string &  op2, const std::string & label)
+//{
+
+//}
+
+
+//void FeatureExpressionFullGraph::
+//display( std::ostream& os ) const
+//{
+//	os <<"featureExpressionFullGraph <"<<name<<">";
+//}
+
+
+std::string FeatureExpressionFullGraph::getDocString () const
 {
-	os <<"featureExpressionFullGraph <"<<name<<">";
+	return ("FeatureExpressionFullGraph");
 }
 
 
-
-void FeatureExpressionFullGraph::
-commandLine( const std::string& cmdLine,
-		std::istringstream& cmdArgs,
-		std::ostream& os )
+void FeatureExpressionFullGraph::initCommands()
 {
-	if( cmdLine=="help" )
-	{
-		os << "featureExpressionFullGraph: "<<endl;
-		Entity::commandLine( cmdLine,cmdArgs,os );
-	}
-	else  //FeatureAbstract::
-		Entity::commandLine( cmdLine,cmdArgs,os );
-
+	namespace dc = dynamicgraph::command;
+	addCommand("setChain",
+	 dc::makeCommandVoid3(*this, &FeatureExpressionFullGraph::setChain,
+	 "chain named [arg1] corresponding to the expression of [arg2] expressed in frame [arg3]"));
 }
-
-
 
 /*
  * Local variables:

@@ -80,6 +80,7 @@ public:
 	std::vector<int> ind_to_sot;
 	unsigned int st_ind_ex;
 	std::vector<double> q_ex;
+	Context::Ptr ctx_;
 	//end
 
 protected:
@@ -104,7 +105,12 @@ public:
 	using FeatureAbstract::jacobianSOUT;
 	using FeatureAbstract::errorSOUT;
 
-	ExpressionMap create_fk_from_urdf(Context::Ptr ctx);
+	void setChain
+	(const std::string & op1, const std::string & op2, const std::string & label);
+
+	ExpressionMap create_fk_from_urdf(
+			Context::Ptr ctx , const std::string & op1,
+			const std::string & op2, const std::string & label);
 	Expression<double>::Ptr distance_btw_origins
 		(Expression<KDL::Frame>::Ptr o1,Expression<KDL::Frame>::Ptr o2);
 	std::vector<int> index_lookup_table
@@ -120,13 +126,12 @@ public:
 	virtual ml::Vector& computeError( ml::Vector& res,int time );
 	virtual ml::Matrix& computeJacobian( ml::Matrix& res,int time );
 
-	virtual void display( std::ostream& os ) const;
+//	virtual void display( std::ostream& os ) const;
 
-	virtual void commandLine( const std::string& cmdLine,
-			std::istringstream& cmdArgs,
-			std::ostream& os );
+	std::string getDocString () const;
 
-  } ;
+	void initCommands();
+} ;
 
 } /* namespace sot */} /* namespace dynamicgraph */
 
