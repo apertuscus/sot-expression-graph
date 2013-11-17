@@ -1,10 +1,11 @@
 #include <sot/core/matrix-homogeneous.hh>
 #include <kdl/expressiontree.hpp>
+
 #ifndef __SOT_FEATURE_EXPRESSIONGRAPH_HELPER_HH__
 #define __SOT_FEATURE_EXPRESSIONGRAPH_HELPER_HH__
 using namespace dynamicgraph::sot;
-KDL::Rotation mlHom2KDLRot (const MatrixHomogeneous &  M);
 
+KDL::Rotation mlHom2KDLRot (const MatrixHomogeneous &  M);
 
 
 const std::string name_joints_sot_order[] ={
@@ -50,8 +51,43 @@ const std::string name_joints_sot_order[] ={
 };
 #define N_OF_JOINTS 39
 
-#endif
 
+
+namespace geometric_primitive
+{
+using namespace KDL;
+
+struct point
+{
+	Expression<KDL::Frame>::Ptr o;
+	Expression<KDL::Vector>::Ptr p;
+};
+//no check done on versor in building up
+struct versor
+{
+	Expression<Frame>::Ptr o;
+	Expression<Vector>::Ptr v;
+};
+struct line
+{
+	Expression<Frame>::Ptr o;
+	Expression<Vector>::Ptr dir;
+	Expression<Vector>::Ptr p;
+};
+struct plane
+{
+	Expression<Frame>::Ptr o;
+	Expression<Vector>::Ptr normal;
+	Expression<Vector>::Ptr p;
+};
+
+/*for all the expressions we soppose that the frames are expressed in a common reference*/
+Expression<double>::Ptr point_point_distance(point p1,point p2);
+Expression<double>::Ptr line_point_distance(point p, line l);
+Expression<double>::Ptr projection_of_point_on_line(point p, line l);
+
+}
+#endif
 
 
 
