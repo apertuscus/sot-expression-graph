@@ -4,3 +4,14 @@ doc/*
 Debug/*
 _build-*
 cmake/*
+CMakeCache.txt
+CMakeFiles/*
+*.cmake
+Makefile
+config.*
+python/CMakeFiles/*
+*.pc
+src/CMakeFiles/*
+src/dynamic_graph/sot/expression_graph/expression_graph/*
+src/*.so
+include/*
