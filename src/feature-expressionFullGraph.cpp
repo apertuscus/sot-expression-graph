@@ -112,7 +112,9 @@ FeatureExpressionFullGraph( const string& ExpressionGraph )
 ,w_T_obj_SIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrixHomo)::position_obj" )
 //,articularJacobianSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrix)::Jq" )
 ,positionRefSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(double)::positionRef" )
-,oneStepOfControlSignal( NULL, "sotfeatureExpressionFullGraph("+name+")::input(double)::oneStepOfControlSignal")
+,oneStepOfControlSignal(boost::bind(&FeatureExpressionFullGraph::oneStepOfControl,this,_1,_2),
+		jointSIN << w_T_obj_SIN << positionRefSIN,
+		"sotfeatureExpressionFullGraph("+name+")::output(double)::oneStepOfControlSignal")
 {
 
 	//the jacobian depends by
@@ -231,10 +233,8 @@ computeJacobian( ml::Matrix& J,int time )
 {
 	sotDEBUG(15)<<"# In {"<<endl;
 
-	/// TODO: triger one computation
-	int dummy;
-	oneStepOfControl(dummy, time);
-//	oneStepOfControlSignal(time);
+	// triger one computation
+	oneStepOfControlSignal(time);
 
 	//evaluate once to update the tree
 	Soutput->value();
@@ -260,10 +260,8 @@ FeatureExpressionFullGraph::computeError( ml::Vector& res,int time )
 {
 	sotDEBUGIN(15);
 
-	/// TODO: triger one computation
-	int dummy;
-	oneStepOfControl(dummy, time);
-//	oneStepOfControlSignal(time);
+	//triger one computation
+	oneStepOfControlSignal(time);
 
 	// resize the result vector and
 	res.resize(dimension_);
