@@ -112,18 +112,17 @@ FeatureExpressionFullGraph( const string& ExpressionGraph )
 ,w_T_obj_SIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrixHomo)::position_obj" )
 //,articularJacobianSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(matrix)::Jq" )
 ,positionRefSIN( NULL,"sotfeatureExpressionFullGraph("+name+")::input(double)::positionRef" )
+,oneStepOfControlSignal( NULL, "sotfeatureExpressionFullGraph("+name+")::input(double)::oneStepOfControlSignal")
 {
 
 	//the jacobian depends by
-	errorSOUT.addDependency( jointSIN );
-	//jacobianSOUT.addDependency(w_T_ee_SIN);
-	jacobianSOUT.addDependency( w_T_obj_SIN );
-	jacobianSOUT.addDependency( positionRefSIN );//this one is not probably necessary...
-	//jacobianSOUT.addDependency( articularJacobianSIN );
-	//the output depends by
-	//jacobianSOUT.addDependency(w_T_ee_SIN);
-	jacobianSOUT.addDependency( w_T_obj_SIN );
+	errorSOUT.addDependency(jointSIN);
+	errorSOUT.addDependency(oneStepOfControlSignal);
 	errorSOUT.addDependency( positionRefSIN );
+
+	jacobianSOUT.addDependency(w_T_obj_SIN);
+	jacobianSOUT.addDependency(oneStepOfControlSignal);
+	jacobianSOUT.addDependency( positionRefSIN );//this one is not probably necessary...
 
 	//signalRegistration(  jointSIN<<<<w_T_obj_SIN<<articularJacobianSIN<<positionRefSIN );
 	signalRegistration(jointSIN<<w_T_obj_SIN<<positionRefSIN );
@@ -187,24 +186,14 @@ void FeatureExpressionFullGraph::setChain
 unsigned int& FeatureExpressionFullGraph::
 getDimension( unsigned int & dim, int /*time*/ )
 {
-	sotDEBUG(25)<<"# In {"<<endl;
-
-	return dim=1;
+	return dimension_;
 }
 
 
 
-/* --------------------------------------------------------------------- */
-/** Compute the interaction matrix from a subset of
- * the possible features.
- */
-
-
-ml::Matrix& FeatureExpressionFullGraph::
-computeJacobian( ml::Matrix& J,int time )
+int& FeatureExpressionFullGraph::
+oneStepOfControl( int& dummy,int time )
 {
-	sotDEBUG(15)<<"# In {"<<endl;
-
 	//read signals!
 	const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
 	const double & pos_des = positionRefSIN(time);
@@ -214,31 +203,49 @@ computeJacobian( ml::Matrix& J,int time )
 	for (unsigned int i=0;i<st_ind_ex;i++)
 		q_ex[i]=q_sot(ind_to_sot[i]);
 
+	// joint positions
 	Soutput->setInputValues(q_ex);
 
-	//TODO use variable type for not controllable objects
+	/// TODO use variable type for not controllable objects
 	//copy object pose and external output
 	for( int i=0;i<3;++i )
 		Soutput->setInputValue(st_ind_ex+i, w_T_obj.elementAt( i,3 ));
+
+	// 4 dof for the rotation
 	Soutput->setInputValue(st_ind_ex+3,mlHom2KDLRot(w_T_obj));
+
 	//copy reference
 	Soutput->setInputValue(st_ind_ex+7,pos_des);
 
+	return dummy;
+}
+
+
+
+/* --------------------------------------------------------------------- */
+/** Compute the interaction matrix from a subset of
+ * the possible features.
+ */
+ml::Matrix& FeatureExpressionFullGraph::
+computeJacobian( ml::Matrix& J,int time )
+{
+	sotDEBUG(15)<<"# In {"<<endl;
+
+	/// TODO: triger one computation
+	int dummy;
+	oneStepOfControl(dummy, time);
+//	oneStepOfControlSignal(time);
 
 	//evaluate once to update the tree
 	Soutput->value();
 
-	J.resize(1,39);
-
-	/*
-	 * compute the Jacobian starting to a zero matrix,
+	/* compute the Jacobian starting to a zero matrix,
 	 * 	i fill in only the lines that are referred in the index map
 	 * 	*/
+	J.resize(dimension_, N_OF_JOINTS);
 	J.setZero();
 	for (int i=0;i<st_ind_ex;++i)
 		J(0,ind_to_sot[i])=Soutput->derivative(i);
-
-
 
 	//return result
 	sotDEBUG(15)<<"# Out }"<<endl;
@@ -253,61 +260,20 @@ FeatureExpressionFullGraph::computeError( ml::Vector& res,int time )
 {
 	sotDEBUGIN(15);
 
-	//read signals!
-	//const MatrixHomogeneous &  w_T_eeReal= w_T_ee_SIN  (time);
-	const MatrixHomogeneous &  w_T_obj=  w_T_obj_SIN (time);
-	//const ml::Matrix & Jq = articularJacobianSIN(time);
-	const double & pos_des = positionRefSIN(time);
-	const ml::Vector & q_sot = jointSIN(time);
-	//cout<< "q_sot.size(): "<<q_sot.size()<<endl;
-	//cout<< "q_ex.size(): "<<q_ex.size()<<endl;
-	//cout<< "st_ind_ex: "<<st_ind_ex<<endl;
-	//copy angles in the vector for the relation
-	for (unsigned int i=0;i<st_ind_ex;i++)
-		q_ex[i]=q_sot(ind_to_sot[i]);
-
-//	std::cout << " q_ex ";
-//	print(q_ex);
-	Soutput->setInputValues(q_ex);
-
-	//TODO use variable type for not controllable objects
-	//copy object pose and external output
-	for( int i=0;i<3;++i )
-		Soutput->setInputValue(st_ind_ex+i, w_T_obj.elementAt( i,3 ));
-	Soutput->setInputValue(st_ind_ex+3,mlHom2KDLRot(w_T_obj));
-	//copy reference
-	Soutput->setInputValue(st_ind_ex+7,pos_des);
-
-
+	/// TODO: triger one computation
+	int dummy;
+	oneStepOfControl(dummy, time);
+//	oneStepOfControlSignal(time);
 
 	// resize the result vector and
-	res.resize(1);
+	res.resize(dimension_);
+
 	//evaluate the result.
 	res(0)=Soutput->value();
 
-
-//	std::cout << " w_T_eeReal  " << w_T_eeReal << std::endl;
-//	std::cout << " w_T_ee  " << w_T_ee->value() << std::endl;
-//	std::cout << " w_T_obj " << w_T_obj << std::endl;
-//	std::cout << std::endl;
-//	std::cout << "Res " << res(0) << std::endl;
 	sotDEBUGOUT(15);
 	return res ;
 }
-
-//void FeatureExpressionFullGraph::defineOperationalPoints(
-//		const std::string & op1, const std::string &  op2, const std::string & label)
-//{
-
-//}
-
-
-//void FeatureExpressionFullGraph::
-//display( std::ostream& os ) const
-//{
-//	os <<"featureExpressionFullGraph <"<<name<<">";
-//}
-
 
 std::string FeatureExpressionFullGraph::getDocString () const
 {
@@ -321,10 +287,7 @@ void FeatureExpressionFullGraph::initCommands()
 	addCommand("setChain",
 	 dc::makeCommandVoid3(*this, &FeatureExpressionFullGraph::setChain,
 	 "chain named [arg1] corresponding to the expression of [arg2] expressed in frame [arg3]"));
+//	addCommand("setType",
+//	 dc::makeCommandVoid3(*this, &FeatureExpressionFullGraph::setType,
+//	 ""));
 }
-
-/*
- * Local variables:
- * c-basic-offset: 2
- * End:
- */

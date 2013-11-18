@@ -90,17 +90,13 @@ protected:
 public:
 	// joint angles
 	dg::SignalPtr< ml::Vector,int > jointSIN;
-	//pose of the robot end effector
-	//dg::SignalPtr< MatrixHomogeneous,int > w_T_ee_SIN;
 
 	//pose of the object
 	dg::SignalPtr< MatrixHomogeneous,int > w_T_obj_SIN;
 
-	//robot jacobian w_J_ee
-	//dg::SignalPtr< ml::Matrix,int > articularJacobianSIN;
-
-
+	// ...
 	dg::SignalPtr< double,int > positionRefSIN;
+	dg::SignalTimeDependent<int,int>  oneStepOfControlSignal;
 
 	using FeatureAbstract::selectionSIN;
 	using FeatureAbstract::jacobianSOUT;
@@ -127,11 +123,12 @@ public:
 	virtual ml::Vector& computeError( ml::Vector& res,int time );
 	virtual ml::Matrix& computeJacobian( ml::Matrix& res,int time );
 
-//	virtual void display( std::ostream& os ) const;
-
 	std::string getDocString () const;
 
 	void initCommands();
+
+private:
+	int & oneStepOfControl(int & dummy, int time);
 } ;
 
 } /* namespace sot */} /* namespace dynamicgraph */
