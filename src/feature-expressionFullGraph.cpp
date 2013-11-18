@@ -164,7 +164,7 @@ void FeatureExpressionFullGraph::setChain
 	//frame of the the object, w.r.t the same world frame
 	w_T_obj=cached<Frame> (frame(w_R_obj,  w_p_obj));
 	//in and out
-	Sreference= input(st_ind_ex+6);
+	Sreference= input(st_ind_ex+7);
 
 	geometric_primitive::point p1{w_T_obj,Constant(Vector(0,0,0))};
 	geometric_primitive::point p2{w_T_ee,Constant(Vector(0,0,0))};
