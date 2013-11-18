@@ -40,6 +40,7 @@
 using namespace dynamicgraph::sot;
 using namespace std;
 using namespace dynamicgraph;
+using namespace KDL;
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureExpressionFullGraph,"FeatureExpressionFullGraph");
 
@@ -94,15 +95,6 @@ std::vector<int> FeatureExpressionFullGraph::index_lookup_table
 	}
 	return jointndx;
 }
-
-
-Expression<double>::Ptr FeatureExpressionFullGraph::distance_btw_origins
-	(Expression<KDL::Frame>::Ptr o1,Expression<KDL::Frame>::Ptr o2)
-{
-	Expression<double>::Ptr d=norm(origin(o1)-origin(o2));
-	return d;
-}
-
 
 FeatureExpressionFullGraph::
 FeatureExpressionFullGraph( const string& ExpressionGraph )
@@ -166,8 +158,8 @@ void FeatureExpressionFullGraph::setChain
 	//in and out
 	Sreference= input(st_ind_ex+7);
 
-	geometric_primitive::point p1{w_T_obj,Constant(Vector(0,0,0))};
-	geometric_primitive::point p2{w_T_ee,Constant(Vector(0,0,0))};
+	geometric_primitive::point p1{w_T_obj,Constant(KDL::Vector(0,0,0))};
+	geometric_primitive::point p2{w_T_ee,Constant(KDL::Vector(0,0,0))};
 	Soutput=geometric_primitive::point_point_distance(p1,p2);
 
 	dimension_ = 1;

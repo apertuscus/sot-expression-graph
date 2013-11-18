@@ -53,7 +53,7 @@
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-using namespace KDL;
+
 namespace dynamicgraph { namespace sot {
 namespace dg = dynamicgraph;
 
@@ -64,8 +64,6 @@ namespace dg = dynamicgraph;
 class SOTfeatureExpressionFullGraph_EXPORT FeatureExpressionFullGraph
 : public FeatureAbstract
   {
-
-
 public:
 	static const std::string CLASS_NAME;
 	virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
@@ -73,14 +71,15 @@ public:
 	DECLARE_NO_REFERENCE;
 
 	/*variables for expression graphs */
-	Expression<KDL::Frame>::Ptr w_T_ee;
-	Expression<KDL::Frame>::Ptr w_T_obj;
-	Expression<double>::Ptr Soutput;
-	Expression<double>::Ptr Sreference;
+	KDL::Expression<KDL::Frame>::Ptr w_T_ee;
+	KDL::Expression<KDL::Frame>::Ptr w_T_obj;
+	KDL::Expression<double>::Ptr Soutput;
+	KDL::Expression<double>::Ptr Sreference;
+
 	std::vector<int> ind_to_sot;
 	unsigned int st_ind_ex;
 	std::vector<double> q_ex;
-	Context::Ptr ctx_;
+	KDL::Context::Ptr ctx_;
 	unsigned dimension_;     // dimension
 	//end
 
@@ -105,13 +104,11 @@ public:
 	void setChain
 	(const std::string & op1, const std::string & op2, const std::string & label);
 
-	ExpressionMap create_fk_from_urdf(
-			Context::Ptr ctx , const std::string & op1,
+	KDL::ExpressionMap create_fk_from_urdf(
+			KDL::Context::Ptr ctx , const std::string & op1,
 			const std::string & op2, const std::string & label);
-	Expression<double>::Ptr distance_btw_origins
-		(Expression<KDL::Frame>::Ptr o1,Expression<KDL::Frame>::Ptr o2);
 	std::vector<int> index_lookup_table
-			(const Context::Ptr ctx,
+			(const KDL::Context::Ptr ctx,
 			 const std::string name_joints[],const int n_of_joints);
 
 public:
@@ -135,9 +132,3 @@ private:
 
 
 #endif // #ifndef __SOT_FEATURE_EXPRESSIONFULLGRAPH_HH__
-
-/*
- * Local variables:
- * c-basic-offset: 2
- * End:
- */
