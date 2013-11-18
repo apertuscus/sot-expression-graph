@@ -81,6 +81,7 @@ public:
 	unsigned int st_ind_ex;
 	std::vector<double> q_ex;
 	Context::Ptr ctx_;
+	unsigned dimension_;     // dimension
 	//end
 
 protected:

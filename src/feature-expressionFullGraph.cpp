@@ -46,21 +46,6 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureExpressionFullGraph,"FeatureExpression
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-#define CHECK( a ) \
-		{ bool result = a; \
-		if (!result) { \
-			std::cerr << __FILE__ << " : " << __LINE__ << " : FAILED: " #a << std::endl;\
-			exit(1);\
-		} \
-		}
-
-template <class T>
-void print (const std::vector<T> & v)
-{
-	for (unsigned i=0; i<v.size(); ++i)
-		std::cout << v[i] << "  ";
-	std::cout << std::endl;
-}
 
 ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(
 		Context::Ptr ctx, const std::string & op1,
@@ -71,16 +56,15 @@ ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(
 			ros::package::getPath("romeo_description")
 			+"/urdf/romeo_small.urdf";
 
-	CHECK( urdf.readFromFile(path_to_file));
+	if (!urdf.readFromFile(path_to_file))
+		throw ("Unable to read file"+path_to_file);
 
 
 	//addTransform gives a name (first arg.)
 	//  to the transformations between base_link (3° arg.) and the
 	//  left/right gripper tool frames ("second arg")
-
-//	CHECK( urdf.addTransform("head","gaze","base")  );
-	CHECK( urdf.addTransform(label, op1, op2)  );
-	//CHECK( urdf.addTransform("right_hand","r_wrist","l_sole")  );
+	if (! urdf.addTransform(label, op1, op2)  )
+		throw ("Unable to create the transformation between " + op1 + " and " + op2);
 
 	//adding transformation for all the kinematic tree, so that all the joints are added
 	ExpressionMap r = urdf.getExpressions(ctx);
@@ -157,6 +141,8 @@ FeatureExpressionFullGraph( const string& ExpressionGraph )
 void FeatureExpressionFullGraph::setChain
 (const std::string & label, const std::string & op1, const std::string & op2)
 {
+	try
+	{
 	ExpressionMap expr_map=create_fk_from_urdf(ctx_, op1, op2, label);
 
 	//build up index table
@@ -183,6 +169,13 @@ void FeatureExpressionFullGraph::setChain
 	geometric_primitive::point p2{w_T_ee,Constant(Vector(0,0,0))};
 	Soutput=geometric_primitive::point_point_distance(p1,p2);
 
+	dimension_ = 1;
+	}
+	catch(std::string & error)
+	{
+		std::cerr << error << std::endl;
+		return;
+	}
 }
 
 
