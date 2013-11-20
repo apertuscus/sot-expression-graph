@@ -77,20 +77,17 @@ ExpressionMap FeatureExpressionFullGraph::create_fk_from_urdf(
  *  the map name_joints (the ordered list of joint of stack of task)
  *  to a list of joints that are in the Context.
  *  */
-std::vector<int> FeatureExpressionFullGraph::index_lookup_table
+std::map<int,int> FeatureExpressionFullGraph::index_lookup_table
 (const Context::Ptr ctx, const std::string name_joints[],const int n_of_joints)
 {
-	std::vector<int> jointndx;
-	for (int i=0;i<n_of_joints; ++i) {
+	std::map<int,int> jointndx;
+	for (int i=0;i<n_of_joints; ++i)
+	{
 		int nr = ctx->getScalarNdx(name_joints[i]);
-		if (nr==-1) //none of the relations depends on the transformations defined
+		if (nr!=-1) //none of the relations depends on the transformations defined
 		{
-			cout<< nr <<"\t"<< name_joints[i] << "  Not Found"  << endl;
-		}
-		else
-		{
-			jointndx.push_back(i);
-			cout<< i <<"\t"<< name_joints[i] << "  saved in position\t"  <<jointndx.size()	- 1 << endl;
+			jointndx[nr] = i;
+			cout<< i <<"\t"<< name_joints[i] << " has this position in the q vector\t"  << jointndx[nr] << endl;
 		}
 	}
 	return jointndx;
@@ -139,11 +136,11 @@ void FeatureExpressionFullGraph::setChain
 	ExpressionMap expr_map=create_fk_from_urdf(ctx_, op1, op2, label);
 
 	//build up index table
-	ind_to_sot=index_lookup_table(ctx_,name_joints_sot_order ,N_OF_JOINTS);
+	index_to_sot=index_lookup_table(ctx_,name_joints_sot_order ,N_OF_JOINTS);
 
 	//save the initial position for saving data that are not joint values (e.g. external frame, input)
 	//TODO this stuff should be substituted by variable type.
-	st_ind_ex=ind_to_sot.size();
+	unsigned st_ind_ex=index_to_sot.size()+1;
 	q_ex.resize(st_ind_ex,0);
 
 	//frame of the robot ee, w.r.t a world frame
@@ -194,8 +191,10 @@ oneStepOfControl( int& dummy,int time )
 	const ml::Vector & q_sot = jointSIN(time);
 
 	//copy angles in the vector for the relation
-	for (unsigned int i=0;i<st_ind_ex;i++)
-		q_ex[i]=q_sot(ind_to_sot[i]);
+	q_ex[0] = time;
+	for(std::map<int,int>::const_iterator it = index_to_sot.begin();
+			it != index_to_sot.end(); ++it)
+		q_ex[it->first]=q_sot(it->second);
 
 	// joint positions
 	Soutput->setInputValues(q_ex);
@@ -236,8 +235,9 @@ computeJacobian( ml::Matrix& J,int time )
 	 * 	*/
 	J.resize(dimension_, N_OF_JOINTS);
 	J.setZero();
-	for (int i=0;i<st_ind_ex;++i)
-		J(0,ind_to_sot[i])=Soutput->derivative(i);
+	for(std::map<int,int>::const_iterator it = index_to_sot.begin();
+			it != index_to_sot.end(); ++it)
+		J(0, it->second)=Soutput->derivative(it->first);
 
 	//return result
 	sotDEBUG(15)<<"# Out }"<<endl;

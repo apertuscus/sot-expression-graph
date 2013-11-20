@@ -76,7 +76,7 @@ public:
 	KDL::Expression<double>::Ptr Soutput;
 	KDL::Expression<double>::Ptr Sreference;
 
-	std::vector<int> ind_to_sot;
+	std::map<int,int> index_to_sot;
 	unsigned int st_ind_ex;
 	std::vector<double> q_ex;
 	KDL::Context::Ptr ctx_;
@@ -107,7 +107,8 @@ public:
 	KDL::ExpressionMap create_fk_from_urdf(
 			KDL::Context::Ptr ctx , const std::string & op1,
 			const std::string & op2, const std::string & label);
-	std::vector<int> index_lookup_table
+
+	std::map<int,int> index_lookup_table
 			(const KDL::Context::Ptr ctx,
 			 const std::string name_joints[],const int n_of_joints);
 
