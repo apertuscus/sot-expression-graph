@@ -28,6 +28,8 @@
 #include <sot/core/debug.hh>
 #include "feature-expressionFullGraph.h"
 #include "helper.h"
+#include "romeo.h"
+
 #include <sot/core/exception-feature.hh>
 #include <dynamic-graph/all-commands.h>
 
