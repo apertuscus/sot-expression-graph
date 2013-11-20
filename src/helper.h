@@ -85,7 +85,16 @@ struct plane
 Expression<double>::Ptr point_point_distance(point p1,point p2);
 Expression<double>::Ptr line_point_distance(point p, line l);
 Expression<double>::Ptr projection_of_point_on_line(point p, line l);
+Expression<double>::Ptr distance_from_lines (line l1, line l2);
 
+ /* Expression<double>::Ptr distance_o1_f1 (line l1, line l2);
+ * Expression<double>::Ptr distance_o2_f2 (line l1, line l2);
+ * Expression<double>::Ptr point_plane_distance (point p, plane pl);
+//angles
+ * Expression<double>::Ptr angle_btw_versors (versor v1, versor v2);
+ * Expression<double>::Ptr incident_angle (versor v, plane pl);
+ * Expression<double>::Ptr angles_btw_planes (plane pl1, plane pl2);
+ * */
 }
 #endif
 
