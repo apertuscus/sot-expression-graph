@@ -115,21 +115,21 @@ computeJacobian( ml::Matrix& J,int time )
   sotDEBUG(15)<<"# In {"<<endl;
 
   //read signals!
-  const MatrixHomogeneous &  w_T_o1=  w_T_o1_SIN (time);
-  const MatrixHomogeneous &  w_T_o2=  w_T_o2_SIN (time);
+  const MatrixHomogeneous &  w_Tm_o1=  w_T_o1_SIN (time);
+  const MatrixHomogeneous &  w_Tm_o2=  w_T_o2_SIN (time);
   const ml::Matrix & w_J_o1 = w_J_o1_SIN(time);
-  const ml::Matrix & w_J_o2 = w_J_o1_SIN(time);
+  const ml::Matrix & w_J_o2 = w_J_o2_SIN(time);
   const double & vectdes = positionRefSIN(time);
   //copy positions
   for( int i=0;i<3;++i )
   {
-	  Soutput->setInputValue(i,w_T_o1.elementAt( i,3 ));
-	  Soutput->setInputValue(i+6, w_T_o2.elementAt( i,3 ));
+	  Soutput->setInputValue(i,w_Tm_o1.elementAt( i,3 ));
+	  Soutput->setInputValue(i+6, w_Tm_o2.elementAt( i,3 ));
   }
   //copy rotations
   //TODO use variable type for not controllable objects
-  Soutput->setInputValue(3,mlHom2KDLRot(w_T_o1));
-  Soutput->setInputValue(9,mlHom2KDLRot(w_T_o2));
+  Soutput->setInputValue(3,mlHom2KDLRot(w_Tm_o1));
+  Soutput->setInputValue(9,mlHom2KDLRot(w_Tm_o2));
   //copy reference
   Soutput->setInputValue(12,vectdes);
 
