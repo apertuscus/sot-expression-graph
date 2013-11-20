@@ -160,6 +160,16 @@ FeatureExpressionFullGraph( const string& ExpressionGraph )
 	//in and out
 	Sreference= input(st_ind_ex+6);
 
+
+	/*here i must give the geometric primitives configuration
+	 * possible primitive are :
+	 * point,
+	 * versor,
+	 * line,
+	 * plane.
+	 *
+	 * each primitive can be combined with specific relation
+	 * */
 	geometric_primitive::point p1{w_T_obj,Constant(Vector(0,0,0))};
 	geometric_primitive::point p2{w_T_ee,Constant(Vector(0,0,0))};
 	Soutput=geometric_primitive::point_point_distance(p1,p2);

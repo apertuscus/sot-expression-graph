@@ -71,8 +71,8 @@ class SOTFeatureExpressionGraph_EXPORT FeatureExpressionGraph
   DECLARE_NO_REFERENCE;
 
   /*variables for expression graphs */
-  Expression<KDL::Frame>::Ptr w_T_ee;
-  Expression<KDL::Frame>::Ptr w_T_obj;
+  Expression<KDL::Frame>::Ptr w_T_o1;
+  Expression<KDL::Frame>::Ptr w_T_o2;
   Expression<double>::Ptr Soutput;
   Expression<double>::Ptr Sreference;
   //end
@@ -83,14 +83,15 @@ class SOTFeatureExpressionGraph_EXPORT FeatureExpressionGraph
  public:
  // dg::SignalPtr< ml::Vector,int > vectorSIN;//what is that for?
 
-  //pose of the robot end effector
-  dg::SignalPtr< MatrixHomogeneous,int > w_T_ee_SIN;
-
+  //pose o1
+  dg::SignalPtr< MatrixHomogeneous,int > w_T_o1_SIN;
+  //robot jacobian w_J_o1
+  dg::SignalPtr< ml::Matrix,int > w_J_o1_SIN;
   //pose of the object
-  dg::SignalPtr< MatrixHomogeneous,int > w_T_obj_SIN;
+  dg::SignalPtr< MatrixHomogeneous,int > w_T_o2_SIN;
+  //robot jacobian w_J_o1
+  dg::SignalPtr< ml::Matrix,int > w_J_o2_SIN;
 
-  //robot jacobian w_J_ee
-  dg::SignalPtr< ml::Matrix,int > articularJacobianSIN;
 
 
   dg::SignalPtr< double,int > positionRefSIN;

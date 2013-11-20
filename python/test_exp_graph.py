@@ -67,10 +67,13 @@ taskExpg = Task('taskExpg')
 taskExpg.controlGain.value = 1
 
 # operational point used
-opPoint = 'left-wrist'
+opPoint1 = 'left-wrist'
+opPoint2 = 'right-wrist'
 # Get the position/Jacobian of the operational point for the dynamic entity
-plug(robot.dynamic.signal(opPoint),expg.signal('position_ee'))
-plug(robot.dynamic.signal('J'+opPoint),expg.signal('Jq'))
+plug(robot.dynamic.signal(opPoint1),expg.signal('w_T_o1'))
+plug(robot.dynamic.signal('J'+opPoint),expg.signal('w_J_o1'))
+plug(robot.dynamic.signal(opPoint1),expg.signal('w_T_o2'))
+plug(robot.dynamic.signal('J'+opPoint),expg.signal('w_J_o2'))
 
 # Associate the feature to the task:
 taskExpg.add(expg.name)
@@ -90,7 +93,7 @@ m2= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.1),
  (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
  (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
  (0.0, 0.0, 0.0, 1.0))
-expg.position_obj.value = m1
+#expg.position_obj.value = m1
 expg.positionRef.value = 0
 
 # add the task corresponding to the expression graph.
