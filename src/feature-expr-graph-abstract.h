@@ -78,7 +78,7 @@ public:
 
  protected:
   //TODO: template?
-  void updateInputValues(KDL::Expression<double>::Ptr, int time);
+  virtual void updateInputValues(KDL::Expression<double>::Ptr, int time);
 
   void evaluateJacobian(ml::Matrix& res, KDL::Expression<double>::Ptr, int time );
 } ;

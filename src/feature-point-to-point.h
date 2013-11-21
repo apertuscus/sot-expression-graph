@@ -77,6 +77,16 @@ public:
   virtual ml::Vector& computeError( ml::Vector& res,int time );
   virtual ml::Matrix& computeJacobian( ml::Matrix& res,int time );
 
+public:
+  // position of the point with respect to the frame o1
+  dg::SignalPtr< ml::Vector,int > p1_SIN;
+
+  // position of the point with respect to the frame o2
+  dg::SignalPtr< ml::Vector,int > p2_SIN;
+
+private:
+  virtual void updateInputValues(KDL::Expression<double>::Ptr Soutput, int time);
+
 private:
   KDL::Expression<double>::Ptr Soutput_;
 } ;
