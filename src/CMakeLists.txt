@@ -11,6 +11,8 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   SHARED
   feature-expressionGraph.cpp
   feature-expressionFullGraph.cpp
+  feature-expr-graph-abstract.cpp
+  feature-point-to-point.cpp
   helper.cpp
 )
 
