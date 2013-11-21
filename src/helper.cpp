@@ -1,6 +1,6 @@
 #include "helper.h"
 using namespace KDL;
-KDL::Rotation mlHom2KDLRot (const MatrixHomogeneous &  M)
+KDL::Rotation mlHom2KDLRot (const dynamicgraph::sot::MatrixHomogeneous &  M)
 {
 	KDL::Rotation Rkdl;
 	for( int i=0;i<3;++i )
