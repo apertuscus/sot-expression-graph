@@ -51,7 +51,9 @@ FeaturePointToPoint( const string& name )
 {
   //
   /*here goes te expressions!!!*/
-  Soutput_=Sreference-norm(origin(w_T_o1) - origin(w_T_o2));
+  geometric_primitive::Point p1 = {w_T_o1, KDL::Constant(KDL::Vector(0,0,0))};
+  geometric_primitive::Point p2 = {w_T_o2, KDL::Constant(KDL::Vector(0,0,0))};
+  Soutput_=Sreference-geometric_primitive::point_point_distance(p1,p2);
 
   //end init
 }
