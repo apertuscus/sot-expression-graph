@@ -61,8 +61,8 @@ FeatureExpressionGraph( const string& ExpressionGraph )
   jacobianSOUT.addDependency( w_J_o2_SIN );
   jacobianSOUT.addDependency( positionRefSIN );//this one is not probably necessary...
   //the output depends by
-  jacobianSOUT.addDependency( w_T_o1_SIN );
-  jacobianSOUT.addDependency( w_T_o2_SIN );
+  errorSOUT.addDependency( w_T_o1_SIN );
+  errorSOUT.addDependency( w_T_o2_SIN );
   errorSOUT.addDependency( positionRefSIN );
 
   signalRegistration( w_T_o1_SIN<<w_T_o2_SIN
@@ -78,13 +78,13 @@ FeatureExpressionGraph( const string& ExpressionGraph )
   Expression<KDL::Vector>::Ptr w_p_o2=KDL::vector(input(6), input(7),input(8));
   Expression<KDL::Rotation>::Ptr w_R_O2= inputRot(9);
   //frame of the the object, w.r.t the same world frame
-  w_T_o2=cached<Frame> (frame(w_R_O2,  w_p_o2));
+  w_T_o2= frame(w_R_O2,  w_p_o2);
   //in and out
   Sreference= input(12);
 
   //
   /*here goes te expressions!!!*/
-  Soutput=cached<double>(Sreference-norm(w_p_o1-w_p_o2));
+  Soutput=Sreference-norm(w_p_o1-w_p_o2);
 
   //end init
 }
@@ -141,9 +141,11 @@ computeJacobian( ml::Matrix& J,int time )
   J.resize(1,w_J_o1.nbCols());
   ml::Matrix Jtask1(1,6);
   ml::Matrix Jtask2(1,6);
+  ml::Matrix ad1(6,6);
+  ml::Matrix ad2(6,6);
 
 
-  //compute the interaction matrix
+  //compute the interaction matrices, that are expressed one in o1 applied
 
   for (int i=0;i<6;++i)
   {
@@ -151,7 +153,29 @@ computeJacobian( ml::Matrix& J,int time )
   	  Jtask2(0,i)=Soutput->derivative(i+6);
   }
   //multiplication!
-  J=Jtask1*w_J_o1+Jtask2*w_J_o2;
+  /*
+   * we need the inverse of the adjoint matrix that brings
+   * from o1(o2) frame to w
+   * this is equal to the adjoint from w to o1(o2)
+   * the matrix is then composed by
+   * w_R_o1| 0
+   * ------+-----
+   *   0   |w_R_o1
+   *    */
+  ad1.setZero();//inverse of ad
+  ad2.setZero();
+
+  for (int i=0;i<3;i++)
+	  for (int j=0;j<3;j++)
+	  {
+		  ad1(i,j)=w_Tm_o1(i,j);
+		  ad1(i+3,j+3)=w_Tm_o1(i,j);
+		  ad2(i,j)=w_Tm_o2(i,j);
+		  ad2(i+3,j+3)=w_Tm_o2(i,j);
+	  }
+
+
+  J=Jtask1*ad1*w_J_o1+Jtask2*ad2*w_J_o2;
 
 //return result
   sotDEBUG(15)<<"# Out }"<<endl;
