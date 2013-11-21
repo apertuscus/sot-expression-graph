@@ -157,8 +157,8 @@ void FeatureExpressionFullGraph::setChain
 	//in and out
 	Sreference= input(st_ind_ex+7);
 
-	geometric_primitive::point p1{w_T_obj,Constant(KDL::Vector(0,0,0))};
-	geometric_primitive::point p2{w_T_ee,Constant(KDL::Vector(0,0,0))};
+  geometric_primitive::Point p1{w_T_obj,Constant(KDL::Vector(0,0,0))};
+  geometric_primitive::Point p2{w_T_ee,Constant(KDL::Vector(0,0,0))};
 	Soutput=geometric_primitive::point_point_distance(p1,p2);
 
 	dimension_ = 1;
