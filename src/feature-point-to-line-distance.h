@@ -90,8 +90,11 @@ public:
 private:
   virtual void updateInputValues(KDL::Expression<double>::Ptr Soutput, int time);
 
+
 private:
   KDL::Expression<double>::Ptr Soutput_;
+
+
 } ;
 
 } /* namespace sot */} /* namespace dynamicgraph */

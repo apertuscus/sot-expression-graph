@@ -79,8 +79,10 @@ FeaturePointToLineDistance( const string& name )
 		  input(EXP_GRAPH_BASE_INDEX+8));
 
   /*here goes te expressions!!!*/
-  geometric_primitive::Point point1 = {w_T_o1, p1};
-  geometric_primitive::Line line2 = {w_T_o2, p2,dir2};
+  geometric_primitive::Point point1 ;
+  point1.o=w_T_o1;point1.p=p1;
+  geometric_primitive::Line line2 ;
+  line2.o=w_T_o2;line2.p=p2;line2.dir=dir2;
   Soutput_=Sreference-geometric_primitive::line_point_distance(point1,line2);
 
   //end init
@@ -112,6 +114,7 @@ void FeaturePointToLineDistance::updateInputValues(KDL::Expression<double>::Ptr 
   FeatureExprGraphAbstract::readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
   FeatureExprGraphAbstract::readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (dir2_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
+
 }
 
 

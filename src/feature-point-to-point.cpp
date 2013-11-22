@@ -62,12 +62,19 @@ FeaturePointToPoint( const string& name )
 
   signalRegistration( p1_SIN << p2_SIN );
 
-  Expression<KDL::Vector>::Ptr p1 = KDL::vector(input(13), input(14),input(15));
-  Expression<KDL::Vector>::Ptr p2 = KDL::vector(input(16), input(17),input(18));
+  Expression<KDL::Vector>::Ptr p1 = KDL::vector(
+		  input(EXP_GRAPH_BASE_INDEX),
+		  input(EXP_GRAPH_BASE_INDEX+1),
+		  input(EXP_GRAPH_BASE_INDEX+2));
+  Expression<KDL::Vector>::Ptr p2 = KDL::vector(
+		  input(EXP_GRAPH_BASE_INDEX+3),
+		  input(EXP_GRAPH_BASE_INDEX+4),
+		  input(EXP_GRAPH_BASE_INDEX+5));
 
-  /*here goes te expressions!!!*/
-  geometric_primitive::Point point1 = {w_T_o1, p1};
-  geometric_primitive::Point point2 = {w_T_o2, p2};
+  /*here goes the expressions!!!*/
+  geometric_primitive::Point point1;  point1.o=w_T_o1;  point1.p= p1;
+  geometric_primitive::Point point2;  point2.o=w_T_o2;  point2.p= p2;
+
   Soutput_=Sreference-geometric_primitive::point_point_distance(point1,point2);
 
   //end init
@@ -97,10 +104,8 @@ void FeaturePointToPoint::updateInputValues(KDL::Expression<double>::Ptr Soutput
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
 
-
   FeatureExprGraphAbstract::readPositionVector(p1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
   FeatureExprGraphAbstract::readPositionVector(p2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);
-
 }
 
 
