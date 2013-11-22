@@ -59,4 +59,15 @@ Expression<double>::Ptr distance_from_lines (const Line &  l1, const Line & l2)
 	return num/den;
 
 }
+
+
+
+Expression<double>::Ptr surface_point_distance(const Point & pt, const Plane & plan)
+{
+  Expression<Vector>::Ptr oa = (plan.o * plan.p) - (pt.o * pt.p);
+  Expression<Vector>::Ptr planNormal = plan.o * plan.normal;
+
+  return  dot(oa, planNormal) - sqrt(norm(oa));
+}
+
 }

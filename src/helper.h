@@ -15,6 +15,7 @@ struct Point
 	Expression<KDL::Frame>::Ptr o;
 	Expression<KDL::Vector>::Ptr p;
 };
+
 //no check done on versor in building up
 struct Versor
 {
@@ -27,6 +28,7 @@ struct Line
 	Expression<Vector>::Ptr dir;
 	Expression<Vector>::Ptr p;
 };
+
 struct Plane
 {
 	Expression<Frame>::Ptr o;
@@ -48,11 +50,10 @@ Expression<double>::Ptr distance_from_lines (const Line& l1, const Line& l2);
  * Expression<double>::Ptr incident_angle (versor v, plane pl);
  * Expression<double>::Ptr angles_btw_planes (plane pl1, plane pl2);
  * */
+
+Expression<double>::Ptr surface_point_distance(const Point & p, const Plane & plan);
 }
-#endif
 
-
-
-
+#endif // __SOT_FEATURE_EXPRESSIONGRAPH_HELPER_HH__
 
 
