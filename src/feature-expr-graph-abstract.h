@@ -33,10 +33,12 @@
 
 #include <kdl/expressiontree.hpp>
 
+//start using new input values from this value (zero index is ok!)
+#define EXP_GRAPH_BASE_INDEX 13
+
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-
 namespace dynamicgraph { namespace sot {
 namespace dg = dynamicgraph;
 
