@@ -47,8 +47,8 @@ using namespace std;
 FeatureExprGraphAbstract::
 FeatureExprGraphAbstract( const string& name )
   : FeatureAbstract( name )
-  ,w_T_o1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::w_T_o1" )
-  ,w_T_o2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(matrixHomo)::w_T_o2" )
+  ,w_T_o1_SIN( NULL,"FeatureExprGraphAbstract("+name+")::input(matrixHomo)::w_T_o1" )
+  ,w_T_o2_SIN( NULL,"FeatureExprGraphAbstract("+name+")::input(matrixHomo)::w_T_o2" )
   ,w_J_o1_SIN( NULL,"sotFeatureExprGraphAbstract("+name+")::input(matrix)::w_J_o1" )
   ,w_J_o2_SIN( NULL,"sotFeatureExprGraphAbstract("+name+")::input(matrix)::w_J_o2" )
   ,referenceSIN( NULL,"sotFeatureExprGraphAbstract("+name+")::input(double)::reference" )
