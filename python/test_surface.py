@@ -57,10 +57,6 @@ from dynamic_graph.sot.core import *
 from dynamic_graph.sot.expression_graph.expression_graph import *
 
 expg = FeaturePointToSurface('expg')
-expg.displaySignals()
-
-
-#solver.sot.clear()
 
 # Define a task
 taskExpg = Task('taskExpg')
@@ -72,22 +68,20 @@ taskExpg.controlGain.value = 1
 opPoint = 'left-wrist'
 
 # Get the position/Jacobian of the operational point for the dynamic entity
-plug(robot.dynamic.signal('J'+opPoint),expg.signal('J_ee'))
-plug(robot.dynamic.signal(opPoint),expg.signal('frame_ee'))
-expg.position_ee.value = (0,0,0)
+plug(robot.dynamic.signal(opPoint),expg.signal('w_T_o1'))
+plug(robot.dynamic.signal('J'+opPoint),expg.signal('w_J_o1'))
+expg.p1.value = (0,0,0)
 
-frame_surf =(( 1, 0, 0, 0),
-      ( 0, 1, 0, 0),
-      ( 0, 0, 1, 0),
-      ( 0, 0, 0, 1))
-
-expg.frame_obj.value = frame_surf
-expg.position_obj.value = (0,0,1)
-expg.normal.value = (0,0,1)
+# frame of reference for the distance
+rpy = PoseRollPitchYawToMatrixHomo('rpy')
+rpy.sin.value = (0, 0.1, 0)
+plug (rpy.sout, expg.w_T_o2)
+expg.p2.value = (0,0,0.8)
+expg.normal_o2.value = (0,0,1)
+expg.reference.value = 0
 
 # Associate the feature to the task:
 taskExpg.add(expg.name)
 
 solver.push(taskExpg)
-
 
