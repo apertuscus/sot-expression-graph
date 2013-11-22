@@ -52,7 +52,7 @@ FeaturePointToPoint( const string& name )
 , p1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p2" )
 {
-  //the jacobian depends by
+  //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
   jacobianSOUT.addDependency( p2_SIN );
 

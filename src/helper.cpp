@@ -28,7 +28,7 @@ Expression<double>::Ptr point_point_distance(const Point & p1,const Point &  p2)
 Expression<double>::Ptr line_point_distance(const Point &  p, const Line & l)
 {
 	Expression<Vector>::Ptr a=l.o*l.p - p.o*p.p; //vector from l.p to p.p (in common frame)
-	Expression<Vector>::Ptr l_dir=l.o*l.dir; //direction vector in common frame
+	Expression<Vector>::Ptr l_dir=rotation(l.o)*l.dir; //direction vector in common frame
 	//check that l_dir is still a versor...
 	l_dir=l_dir*(Constant<double>(1)/norm(l_dir));
 	return	abs(dot(a,l_dir));
