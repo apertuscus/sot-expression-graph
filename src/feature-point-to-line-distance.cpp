@@ -81,7 +81,7 @@ FeaturePointToLineDistance( const string& name )
   /*here goes te expressions!!!*/
   geometric_primitive::Point point1 = {w_T_o1, p1};
   geometric_primitive::Line line2 = {w_T_o2, p2,dir2};
-  Soutput_=Sreference-geometric_primitive::point_line_distance(point1,line2);
+  Soutput_=Sreference-geometric_primitive::line_point_distance(point1,line2);
 
   //end init
 }
