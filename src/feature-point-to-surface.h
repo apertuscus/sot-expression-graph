@@ -26,7 +26,7 @@
 /* --------------------------------------------------------------------- */
 
 /* SOT */
-#include <sot/core/feature-abstract.hh>
+#include "feature-expr-graph-abstract.h"
 #include <sot/core/exception-task.hh>
 #include <sot/core/matrix-homogeneous.hh>
 
@@ -45,7 +45,7 @@ namespace dg = dynamicgraph;
   \brief
 */
 class FeaturePointToSurface
-: public FeatureAbstract
+: public FeatureExprGraphAbstract
 {
 
 public:
@@ -70,42 +70,19 @@ private:
 
 public:
 
-  /*variables for expression graphs */
-  KDL::Expression<KDL::Frame>::Ptr w_T_ee_;
-  KDL::Expression<KDL::Frame>::Ptr w_T_obj_;
-
   KDL::Expression<double>::Ptr Soutput_;
   //end
 
   /* --- SIGNALS ------------------------------------------------------------ */
  public:
-  //jacobian of the robot end effector
-  dg::SignalPtr< ml::Matrix,int > jacobian_ee_SIN;
 
-  //pose of the robot end effector
-  dg::SignalPtr< MatrixHomogeneous,int > w_T_ee_SIN;
-
-  dg::SignalPtr< ml::Vector,int > position_ee_SIN;
-
-
-
-  //jacobian of the robot end effector
-  dg::SignalPtr< ml::Matrix,int > jacobian_obj_SIN;
-
-  //frame of the surface
-  dg::SignalPtr< MatrixHomogeneous,int > w_T_obj_SIN;
+  dg::SignalPtr< ml::Vector,int > p1_SIN;
 
   // a point belonging to the surface
-  dg::SignalPtr< ml::Vector,int > position_obj_SIN;
+  dg::SignalPtr< ml::Vector,int > p2_SIN;
 
   // normal of the surface (expressed in the frame of the surface)
   dg::SignalPtr< ml::Vector,int > normalSIN;
-
-
-//  using FeatureAbstract::selectionSIN;
-//  using FeatureAbstract::jacobianSOUT;
-//  using FeatureAbstract::errorSOUT;
-
 
 // internal data (to avoid memory allocation)
 private:
@@ -117,9 +94,3 @@ private:
 
 
 #endif // #ifndef __SOT_FEATURE_EXPRESSIONGRAPH_HH__
-
-/*
- * Local variables:
- * c-basic-offset: 2
- * End:
- */
