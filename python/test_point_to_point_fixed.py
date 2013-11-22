@@ -1,6 +1,5 @@
 import roslib
 import rospy
-import tf
 import numpy
 
 
@@ -56,9 +55,8 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.expression_graph.expression_graph import *
 
-expg = FeatureExpressionGraph('expg')
-expg.displaySignals()
-
+# Define the point 2 point feature
+expg = FeaturePointToPoint('expg')
 
 # Define a task
 taskExpg = Task('taskExpg')
@@ -68,38 +66,26 @@ taskExpg.controlGain.value = 1
 
 # operational point used
 opPoint1 = 'left-wrist'
-opPoint2 = 'right-wrist'
+
 # Get the position/Jacobian of the operational point for the dynamic entity
-plug(robot.dynamic.signal(opPoint1),expg.signal('w_T_o2'))
-plug(robot.dynamic.signal('J'+opPoint1),expg.signal('w_J_o2'))
+plug(robot.dynamic.signal(opPoint1),expg.signal('w_T_o1'))
+plug(robot.dynamic.signal('J'+opPoint1),expg.signal('w_J_o1'))
 
 
 # Associate the feature to the task:
 taskExpg.add(expg.name)
 
-# check what signals are defined now
-# ... define the other signals position_obj and positionRef
-
-# expg.position_obj.value = ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.10328669911264382),
-#  (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
-#  (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   0.724250138032145),
-#  (0.0, 0.0, 0.0, 1.0))
-m1= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0.3),
- (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.24253855350188092),
- (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
- (0.0, 0.0, 0.0, 1.0))
+# define the target position
 m2= ((0.6625918136377457,  -0.5220206076684805,   0.5370908430327903,  0),
- (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0),
- (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   1),
+ (-0.12627042880607656,  0.6289750604880604,   0.7671024391130369,   0.3),
+ (-0.7382600268938936,   -0.5760944874354131,   0.35083796008578705,   0.9),
  (0.0, 0.0, 0.0, 1.0))
-#expg.position_obj.value = m1
-expg.positionRef.value = 0
-expg.w_T_o1.value=m2
-J=numpy.zeros(shape=(6,39));
-expg.w_J_o1.value=J;
-# add the task corresponding to the expression graph.
-# note that the contacts have already been added (to have having a flying robot).
-solver.push(taskExpg)
 
-expg.displaySignals()
+# the distance towards this target position is 0
+expg.reference.value = 0
+expg.w_T_o2.value=m2
+
+# add the task corresponding to the expression graph.
+# note that the contacts have already been added (to avoid having a flying robot).
+solver.push(taskExpg)
 

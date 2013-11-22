@@ -111,23 +111,13 @@ evaluateJacobian( ml::Matrix& res, KDL::Expression<double>::Ptr Soutput, int tim
   const MatrixHomogeneous &  w_Tm_o1=  w_T_o1_SIN (time);
   const MatrixHomogeneous &  w_Tm_o2=  w_T_o2_SIN (time);
   const ml::Matrix & w_J_o1 = w_J_o1_SIN(time);
-  const ml::Matrix & w_J_o2 = w_J_o2_SIN(time);
-
-  //resize the matrices
-//  res.resize(1,w_J_o1.nbCols());
   ml::Matrix Jtask1(1,6);
-  ml::Matrix Jtask2(1,6);
   ml::Matrix ad1(6,6);
-  ml::Matrix ad2(6,6);
-
 
   //compute the interaction matrices, that are expressed one in o1 applied
-
   for (int i=0;i<6;++i)
-  {
-	  Jtask1(0,i)=Soutput->derivative(i);
-  	Jtask2(0,i)=Soutput->derivative(i+6);
-  }
+    Jtask1(0,i)=Soutput->derivative(i);
+
   //multiplication!
   /*
    * we need the inverse of the adjoint matrix that brings
@@ -139,19 +129,30 @@ evaluateJacobian( ml::Matrix& res, KDL::Expression<double>::Ptr Soutput, int tim
    *   0   |w_R_o1
    *    */
   ad1.setZero();//inverse of ad
-  ad2.setZero();
 
   for (int i=0;i<3;i++)
-	  for (int j=0;j<3;j++)
-	  {
-		  ad1(i,j)=w_Tm_o1(i,j);
-		  ad1(i+3,j+3)=w_Tm_o1(i,j);
-		  ad2(i,j)=w_Tm_o2(i,j);
-		  ad2(i+3,j+3)=w_Tm_o2(i,j);
-	  }
+    for (int j=0;j<3;j++)
+      ad1(i,j) = ad1(i+3,j+3) = w_Tm_o1(i,j);
 
+  res = Jtask1*ad1*w_J_o1;
 
-  res = Jtask1*ad1*w_J_o1+Jtask2*ad2*w_J_o2;
+  if(w_J_o2_SIN.isPluged())
+  {
+    const ml::Matrix & w_J_o2 = w_J_o2_SIN(time);
+    ml::Matrix Jtask2(1,6);
+    ml::Matrix ad2(6,6);
+    ad2.setZero();
+
+    //compute the interaction matrices, that are expressed one in o1 applied
+    for (int i=0;i<6;++i)
+      Jtask2(0,i)=Soutput->derivative(i+6);
+
+    for (int i=0;i<3;i++)
+      for (int j=0;j<3;j++)
+        ad2(i,j) = ad2(i+3,j+3) = w_Tm_o2(i,j);
+
+    res += Jtask2*ad2*w_J_o2;
+  }
 }
 /*
  * readPositionVector:
