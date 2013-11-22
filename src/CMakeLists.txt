@@ -13,6 +13,7 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   feature-expressionFullGraph.cpp
   feature-expr-graph-abstract.cpp
   feature-point-to-point.cpp
+  feature-point-to-surface.cpp
   helper.cpp
 )
 
