@@ -81,6 +81,17 @@ public:
  protected:
   //TODO: template?
   virtual void updateInputValues(KDL::Expression<double>::Ptr, int time);
+//also these could be templated w.r.t the expression type
+  bool readPositionVector(
+		   dg::SignalPtr< ml::Vector,int >& SIN,
+		  unsigned int base,
+		 const KDL::Expression<double>::Ptr & exp,
+		  const int time);
+  bool readVersorVector(
+		   dg::SignalPtr< ml::Vector,int >& SIN,
+		  unsigned int base,
+ 		 const KDL::Expression<double>::Ptr & exp,
+ 		  const int time);
 
   void evaluateJacobian(ml::Matrix& res, KDL::Expression<double>::Ptr, int time );
 } ;

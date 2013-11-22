@@ -97,7 +97,10 @@ void FeaturePointToPoint::updateInputValues(KDL::Expression<double>::Ptr Soutput
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
 
-  if(p1_SIN.isPluged())
+
+  FeatureExprGraphAbstract::readPositionVector(p1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput_,time);
+  FeatureExprGraphAbstract::readPositionVector(p2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput_,time);
+ /* if(p1_SIN.isPluged())
   {
     const ml::Vector & p1 = p1_SIN(time);
     for( int i=0;i<3;++i )
@@ -120,7 +123,7 @@ void FeaturePointToPoint::updateInputValues(KDL::Expression<double>::Ptr Soutput
   {
     for( int i=0;i<3;++i )
       Soutput->setInputValue(16+i, 0);
-  }
+  }*/
 }
 
 
