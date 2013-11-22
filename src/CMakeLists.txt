@@ -14,6 +14,7 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   feature-expr-graph-abstract.cpp
   feature-point-to-point.cpp
   feature-point-to-surface.cpp
+  feature-point-to-line-distance.cpp
   helper.cpp
 )
 
