@@ -48,46 +48,30 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeaturePointToSurface,"FeaturePointToSurface"
 
 FeaturePointToSurface::
 FeaturePointToSurface( const string& ExpressionGraph )
-: FeatureAbstract( ExpressionGraph )
-, jacobian_ee_SIN ( NULL,"FeaturePointToSurface("+name+")::input(matrix)::J_ee" )
-, w_T_ee_SIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::frame_ee" )
-, position_ee_SIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::position_ee" )
-
-, jacobian_obj_SIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::J_obj" )
-, w_T_obj_SIN( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::frame_obj" )
-, position_obj_SIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::position_obj" )
-, normalSIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::normal" )
+: FeatureExprGraphAbstract( ExpressionGraph )
+, p1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p1" )
+, p2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p2" )
+, normalSIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::normal_o2" )
 {
   //the jacobian depends by
-//  jacobianSOUT.addDependency( w_T_ee_SIN );
-//  jacobianSOUT.addDependency( w_T_obj_SIN );
-  jacobianSOUT.addDependency( jacobian_ee_SIN );//this one is not probably necessary...
-  jacobianSOUT.addDependency( jacobian_obj_SIN );
+  jacobianSOUT.addDependency( p1_SIN );
+  jacobianSOUT.addDependency( p2_SIN );
 
   //the output depends by
-//  jacobianSOUT.addDependency( w_T_ee_SIN );
-//  jacobianSOUT.addDependency( w_T_obj_SIN );
-//  errorSOUT.addDependency( positionRefSIN );
+  errorSOUT.addDependency( p1_SIN );
+  errorSOUT.addDependency( p2_SIN );
 
-  signalRegistration(jacobian_ee_SIN << w_T_ee_SIN << position_ee_SIN);
-  signalRegistration(jacobian_obj_SIN << w_T_obj_SIN << position_obj_SIN << normalSIN);
+  signalRegistration(p1_SIN);
+  signalRegistration(p2_SIN << normalSIN);
 
   // init of expression graph
   //frame of the robot ee, w.r.t a world frame
-  Expression<KDL::Vector>::Ptr w_p_ee = KDL::vector(input(0), input(1),input(2));
-  Expression<KDL::Rotation>::Ptr w_R_ee = inputRot(3);
-  w_T_ee_ = frame(w_R_ee,  w_p_ee);
-  Expression<KDL::Vector>::Ptr pos_ee = KDL::vector(input(7), input(8),input(9));
+  Expression<KDL::Vector>::Ptr p1 = KDL::vector(input(13), input(14),input(15));
+  Expression<KDL::Vector>::Ptr p2 = KDL::vector(input(16), input(17),input(18));
+  Expression<KDL::Vector>::Ptr normal = KDL::vector(input(19), input(20),input(21));
 
-  //frame of the the object, w.r.t the same world frame
-  Expression<KDL::Vector>::Ptr w_p_obj =KDL::vector(input(10), input(11),input(12));
-  Expression<KDL::Rotation>::Ptr w_R_obj= inputRot(13);
-  w_T_obj_ = frame(w_R_obj,  w_p_obj);
-  Expression<KDL::Vector>::Ptr normal = KDL::vector(input(17), input(18),input(19));
-  Expression<KDL::Vector>::Ptr pos_obj = KDL::vector(input(20), input(21),input(22));
-
-  geometric_primitive::Point pt   = {w_T_ee_, pos_ee}; /// TODO
-  geometric_primitive::Plane surf = {w_T_obj_, normal, pos_obj}; /// TODO
+  geometric_primitive::Point pt   = {w_T_o1, p1}; /// TODO
+  geometric_primitive::Plane surf = {w_T_o2, normal, p2}; /// TODO
 
   Soutput_ = geometric_primitive::surface_point_distance(pt, surf);
   //declare dependecies
@@ -119,65 +103,26 @@ int & FeaturePointToSurface::
 oneStepOfControl( int& dummy,int time )
 {
   sotDEBUG(15)<<"# In {"<<endl;
+  updateInputValues(Soutput_, time);
 
   //read signals!
-  const MatrixHomogeneous &  w_T_ee_Sig=  w_T_ee_SIN (time);
-  const MatrixHomogeneous &  w_T_obj_Sig=  w_T_obj_SIN (time);
-  const ml::Matrix & Jq_ee = jacobian_ee_SIN(time);
+  const ml::Vector & p_o1 = p1_SIN(time);
+  const ml::Vector & p_o2 = p2_SIN(time);
   const ml::Vector & normal  = normalSIN(time);
-  const ml::Vector & pos_ee  = position_ee_SIN(time);
-  const ml::Vector & pos_obj = position_obj_SIN(time);
 
-  //copy positions
+  // copty that into input
   for( int i=0;i<3;++i )
-    Soutput_->setInputValue(i,w_T_ee_Sig.elementAt( i,3 ));
-  Soutput_->setInputValue(3,mlHom2KDLRot(w_T_ee_Sig));
-
-  for( int i=0;i<3;++i )
-    Soutput_->setInputValue(7+i,pos_ee(i));
-
-  for( int i=0;i<3;++i )
-    Soutput_->setInputValue(10+i, w_T_obj_Sig.elementAt( i,3 ));
-  Soutput_->setInputValue(13,mlHom2KDLRot(w_T_obj_Sig));
-
-  //copy normal
-  for( int i=0;i<3;++i )
-    Soutput_->setInputValue(17+i,normal(i));
-
-  for( int i=0;i<3;++i )
-    Soutput_->setInputValue(20+i,pos_obj(i));
-
+  {
+    Soutput_->setInputValue(13+i, p_o1(i));
+    Soutput_->setInputValue(16+i, p_o2(i));
+    Soutput_->setInputValue(19+i, normal(i));
+  }
 
   //evaluate once to update the tree
   error_.resize(1);
   error_(0) = Soutput_->value();
 
-  //compute the interaction matrix
-  ml::Matrix Jtask(1,6);
-  for (int i=0;i<6;++i)
-    Jtask(0,i)=Soutput_->derivative(i);
-
-  //multiplication!
-  if (!jacobian_obj_SIN.isPluged())
-    jacobian_ = Jtask * Jq_ee;
-  else
-  {
-    const ml::Matrix & Jq_obj = jacobian_obj_SIN(time);
-    jacobian_ = Jtask * (Jq_ee - Jq_obj);
-  }
-
-  // debug
-  {
-    std::cout << "normal " << normal << std::endl;
-    geometric_primitive::Point pt   = {w_T_ee_,  KDL::Constant(KDL::Vector(pos_ee(0),pos_ee(1),pos_ee(2)))}; /// TODO
-    geometric_primitive::Plane surf = {w_T_obj_,
-                                       KDL::Constant(KDL::Vector(normal(0),normal(1),normal(2))),
-                                       KDL::Constant(KDL::Vector(pos_obj(0),pos_obj(1),pos_obj(2)))}; /// TODO
-
-    geometric_primitive::surface_point_distance(pt, surf);
-  }
-
-  dummy = 1;
+  evaluateJacobian(jacobian_, Soutput_, time);
   return dummy;
 }
 

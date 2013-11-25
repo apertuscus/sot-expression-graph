@@ -73,7 +73,7 @@ Expression<double>::Ptr surface_point_distance(const Point & pt, const Plane & p
   Expression<Vector>::Ptr oa = (plan.o * plan.p) - (pt.o * pt.p);
   Expression<Vector>::Ptr planNormal = plan.o * plan.normal;
 
-  return  dot(oa, planNormal) - sqrt(norm(oa));
+  return  dot(oa, planNormal);
 }
 
 }
