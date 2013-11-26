@@ -18,6 +18,7 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   feature-line-to-line-distance.cpp	
   feature-versor-to-versor-angle.cpp	
   feature-point-to-line-projection.cpp	
+  feature-angle-btw-planes.cpp
   helper.cpp
 )
 

@@ -45,7 +45,7 @@ Expression<double>::Ptr surface_point_distance(const Point & p, const Plane & pl
 
  /* Expression<double>::Ptr distance_o1_f1 (line l1, line l2);
  * Expression<double>::Ptr distance_o2_f2 (line l1, line l2);
- * Expression<double>::Ptr point_plane_distance (point p, plane pl);
+ *
 //angles
  * Expression<double>::Ptr angle_btw_versors (versor v1, versor v2);
  * Expression<double>::Ptr incident_angle (versor v, plane pl);
