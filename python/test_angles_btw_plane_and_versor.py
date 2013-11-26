@@ -57,9 +57,10 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.expression_graph.expression_graph import *
 
-planeplane = FeatureAngleBtwPlanes('planeplane')
+
+planeversor = FeatureAngleBtwPlaneAndVersor('planeversor')
 pointpoint = FeaturePointToPoint('pointpoint')
-planeplane.displaySignals()
+planeversor.displaySignals()
 
 
 # Define a task
@@ -72,10 +73,10 @@ taskExpg.controlGain.value = 1
 opPoint1 = 'left-wrist' 
 opPoint2 = 'right-wrist'
 # Get the positions/Jacobians of the operational points for the dynamic entity
-plug(robot.dynamic.signal(opPoint1),planeplane.signal('w_T_o1'))
-plug(robot.dynamic.signal('J'+opPoint1),planeplane.signal('w_J_o1'))
-plug(robot.dynamic.signal(opPoint2),planeplane.signal('w_T_o2'))
-plug(robot.dynamic.signal('J'+opPoint2),planeplane.signal('w_J_o2'))
+plug(robot.dynamic.signal(opPoint1),planeversor.signal('w_T_o1'))
+plug(robot.dynamic.signal('J'+opPoint1),planeversor.signal('w_J_o1'))
+plug(robot.dynamic.signal(opPoint2),planeversor.signal('w_T_o2'))
+plug(robot.dynamic.signal('J'+opPoint2),planeversor.signal('w_J_o2'))
 
 plug(robot.dynamic.signal(opPoint1),pointpoint.signal('w_T_o1'))
 plug(robot.dynamic.signal('J'+opPoint1),pointpoint.signal('w_J_o1'))
@@ -83,14 +84,14 @@ plug(robot.dynamic.signal(opPoint2),pointpoint.signal('w_T_o2'))
 plug(robot.dynamic.signal('J'+opPoint2),pointpoint.signal('w_J_o2'))
 # Associate the feature to the task:
 taskExpg.add(pointpoint.name)
-taskExpg.add(planeplane.name)
+taskExpg.add(planeversor.name)
 
 #desired value
-planeplane.reference.value = 0
+planeversor.reference.value = numpy.pi/2
 pointpoint.reference.value = 0.0001
 
-planeplane.norm1.value= (1.0,  0.0, 0.0)
-planeplane.norm2.value= (0.0,  1.0, 0.0)
+planeversor.norm1.value= (1.0,  0.0, 0.0)
+planeversor.v2.value= (1.0,  0.0, 0.0)
 # add the task corresponding to the expression graph.
 # note that the contacts have already been added (to have having a flying robot).
 solver.push(taskExpg)

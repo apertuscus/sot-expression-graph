@@ -19,6 +19,7 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   feature-versor-to-versor-angle.cpp	
   feature-point-to-line-projection.cpp	
   feature-angle-btw-planes.cpp
+  feature-angle-btw-plane-versor.cpp
   helper.cpp
 )
 

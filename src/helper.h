@@ -51,8 +51,9 @@ Expression<double>::Ptr surface_point_distance(const Point & p, const Plane & pl
  * Expression<double>::Ptr incident_angle (versor v, plane pl);
  * Expression<double>::Ptr angles_btw_planes (plane pl1, plane pl2);
  * */
-Expression<double>::Ptr angles_btw_planes (const Plane & pl1, const Plane & pl2);
+Expression<double>::Ptr angle_btw_planes (const Plane & pl1, const Plane & pl2);
 Expression<double>::Ptr angle_btw_versors (const Versor & v1, const Versor& v2);
+Expression<double>::Ptr angle_btw_plane_and_versor (const Plane & p, const Versor& v);
 
 //helper functions
 Expression<Vector>::Ptr ExpressInBase(const Point & p);

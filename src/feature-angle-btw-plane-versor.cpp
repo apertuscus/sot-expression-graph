@@ -26,7 +26,7 @@
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
-#include "feature-angle-btw-planes.h"
+#include "feature-angle-btw-plane-versor.h"
 #include "helper.h"
 #include <sot/core/exception-feature.hh>
 
@@ -40,58 +40,52 @@ using namespace dynamicgraph;
 using namespace KDL;
 using namespace std;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureAngleBtwPlanes,"FeatureAngleBtwPlanes");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureAngleBtwPlaneAndVersor,"FeatureAngleBtwPlaneAndVersor");
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-FeatureAngleBtwPlanes::
-FeatureAngleBtwPlanes( const string& name )
+FeatureAngleBtwPlaneAndVersor::
+FeatureAngleBtwPlaneAndVersor( const string& name )
 : FeatureExprGraphAbstract( name )
 , p1_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::p1" )
-, p2_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::p2" )
 , norm1_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::norm1" )
-, norm2_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::norm2" )
+, versor2_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::v2" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
-  jacobianSOUT.addDependency( p2_SIN );
   jacobianSOUT.addDependency( norm1_SIN );
-  jacobianSOUT.addDependency( norm2_SIN );
+  jacobianSOUT.addDependency( versor2_SIN );
 
   //the output depends by
   errorSOUT.addDependency( p1_SIN );
-  errorSOUT.addDependency( p2_SIN );
   errorSOUT.addDependency( norm1_SIN );
-  errorSOUT.addDependency( norm2_SIN );
+  errorSOUT.addDependency( versor2_SIN );
 
-  signalRegistration( p1_SIN << p2_SIN <<norm1_SIN<<norm2_SIN);
+  signalRegistration( p1_SIN  <<norm1_SIN<<versor2_SIN);
 
   Expression<KDL::Vector>::Ptr p1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX),
 		  input(EXP_GRAPH_BASE_INDEX+1),
 		  input(EXP_GRAPH_BASE_INDEX+2));
-  Expression<KDL::Vector>::Ptr p2 = KDL::vector(
+  Expression<KDL::Vector>::Ptr norm1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX+3),
 		  input(EXP_GRAPH_BASE_INDEX+4),
 		  input(EXP_GRAPH_BASE_INDEX+5));
-  Expression<KDL::Vector>::Ptr norm1 = KDL::vector(
+  Expression<KDL::Vector>::Ptr versor2 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX+6),
 		  input(EXP_GRAPH_BASE_INDEX+7),
 		  input(EXP_GRAPH_BASE_INDEX+8));
-  Expression<KDL::Vector>::Ptr norm2 = KDL::vector(
-		  input(EXP_GRAPH_BASE_INDEX+9),
-		  input(EXP_GRAPH_BASE_INDEX+10),
-		  input(EXP_GRAPH_BASE_INDEX+11));
+
 
   /*here goes the expressions!!!*/
-  geometric_primitive::Plane plane1 ;
-  plane1.o=w_T_o1;plane1.p=p1;plane1.normal=norm1;
+  geometric_primitive::Plane plane ;
+  plane.o=w_T_o1;plane.p=p1;plane.normal=norm1;
 
-  geometric_primitive::Plane plane2 ;
-  plane2.o=w_T_o2;plane2.p=p2;plane2.normal=norm2;
-  Soutput_=Sreference-geometric_primitive::angle_btw_planes(plane1,plane2);
+  geometric_primitive::Versor versor ;
+  versor.o=w_T_o2;versor.v=versor2;
+  Soutput_=Sreference-geometric_primitive::angle_btw_plane_and_versor(plane,versor);
 
   //end init
 }
@@ -101,7 +95,7 @@ FeatureAngleBtwPlanes( const string& name )
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-unsigned int& FeatureAngleBtwPlanes::
+unsigned int& FeatureAngleBtwPlaneAndVersor::
 getDimension( unsigned int & dim, int /*time*/ )
 {
   sotDEBUG(25)<<"# In {"<<endl;
@@ -116,19 +110,18 @@ getDimension( unsigned int & dim, int /*time*/ )
  * the possible features.
  */
 
-void FeatureAngleBtwPlanes::updateInputValues(KDL::Expression<double>::Ptr Soutput, int time)
+void FeatureAngleBtwPlaneAndVersor::updateInputValues(KDL::Expression<double>::Ptr Soutput, int time)
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
   //same order that in the constructor!
   FeatureExprGraphAbstract::readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
-  FeatureExprGraphAbstract::readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
-  FeatureExprGraphAbstract::readVersorVector  (norm1_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
-  FeatureExprGraphAbstract::readVersorVector  (norm2_SIN,EXP_GRAPH_BASE_INDEX+9,	Soutput,time);
+  FeatureExprGraphAbstract::readVersorVector  (norm1_SIN,EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
+  FeatureExprGraphAbstract::readVersorVector  (versor2_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
 
 }
 
 
-ml::Matrix& FeatureAngleBtwPlanes::
+ml::Matrix& FeatureAngleBtwPlaneAndVersor::
 computeJacobian( ml::Matrix& J,int time )
 {
   sotDEBUG(15)<<"# In {"<<endl;
@@ -148,7 +141,7 @@ computeJacobian( ml::Matrix& J,int time )
 *a the possible features.
  */
 ml::Vector&
-FeatureAngleBtwPlanes::computeError( ml::Vector& res,int time )
+FeatureAngleBtwPlaneAndVersor::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
   updateInputValues(Soutput_, time);

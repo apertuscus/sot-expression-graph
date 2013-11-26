@@ -89,7 +89,7 @@ Expression<double>::Ptr line_line_distance (const Line &  l1, const Line & l2)
 }
 
 
-//done by Francois
+
 Expression<double>::Ptr surface_point_distance(const Point & pt, const Plane & plan)
 {
   Expression<Vector>::Ptr oa = (plan.o * plan.p) - (pt.o * pt.p);
@@ -102,10 +102,17 @@ Expression<double>::Ptr angle_btw_versors (const Versor & v1, const Versor& v2)
 	Expression<Vector>::Ptr vrs2=ExpressInBase(v2);
 	return KDL::acos(dot(vrs1,vrs2));
 }
-Expression<double>::Ptr angles_btw_planes (const Plane & pl1, const Plane & pl2)
+Expression<double>::Ptr angle_btw_planes (const Plane & pl1, const Plane & pl2)
 {
 	Expression<Vector>::Ptr vrs1=ExpressDirectionInBase(pl1);
 	Expression<Vector>::Ptr vrs2=ExpressDirectionInBase(pl2);
 	return KDL::acos(dot(vrs2,vrs1));
 }
+Expression<double>::Ptr angle_btw_plane_and_versor (const Plane & pl, const Versor& v)
+{
+	Expression<Vector>::Ptr vrs1=ExpressDirectionInBase(pl);
+	Expression<Vector>::Ptr vrs2=ExpressInBase(v);
+	return Constant<double>(PI/2)-acos(dot(vrs2,vrs1));
+}
+
 }

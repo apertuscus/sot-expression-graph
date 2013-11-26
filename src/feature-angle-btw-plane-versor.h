@@ -18,8 +18,8 @@
  * with sot-core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOT_FEATURE_ANGLES_BTW_PLANES_HH__
-#define __SOT_FEATURE_ANGLES_BTW_PLANES_HH__
+#ifndef __SOT_FEATURE_ANGLE_BTW_PLANE_VERSOR_HH__
+#define __SOT_FEATURE_ANGLE_BTW_PLANE_VERSOR_HH__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -40,12 +40,12 @@
 
 #if defined (WIN32)
 #  if defined (feature_vector3_EXPORTS)
-#    define SOTFeatureAngleBtwPlane_EXPORT __declspec(dllexport)
+#    define SOTFeatureAngleBtwPlaneAndVersor_EXPORT __declspec(dllexport)
 #  else
-#    define SOTFeatureAngleBtwPlane_EXPORT __declspec(dllimport)
+#    define SOTFeatureAngleBtwPlaneAndVersor_EXPORT __declspec(dllimport)
 #  endif
 #else
-#  define SOTFeatureAngleBtwPlane_EXPORT
+#  define SOTFeatureAngleBtwPlaneAndVersor_EXPORT
 #endif
 
 /* --------------------------------------------------------------------- */
@@ -59,7 +59,7 @@ namespace dg = dynamicgraph;
   \class FeaturePointToLine
   \brief Class that defines example of expression graps
 */
-class FeatureAngleBtwPlanes
+class FeatureAngleBtwPlaneAndVersor
 : public FeatureExprGraphAbstract
 {
 public:
@@ -69,8 +69,8 @@ public:
   DECLARE_NO_REFERENCE;
 
 public:
-  FeatureAngleBtwPlanes( const std::string& name );
-  virtual ~FeatureAngleBtwPlanes( void ) {}
+  FeatureAngleBtwPlaneAndVersor( const std::string& name );
+  virtual ~FeatureAngleBtwPlaneAndVersor( void ) {}
 
   virtual unsigned int& getDimension( unsigned int & dim, int time );
 
@@ -81,14 +81,12 @@ public:
   // position of the point with respect to the frame o1
   dg::SignalPtr< ml::Vector,int > p1_SIN;
 
-  // origin of the line  with respect to the frame o2
-  dg::SignalPtr< ml::Vector,int > p2_SIN;
 
   // direction of the line  with respect to the frame o1
   dg::SignalPtr< ml::Vector,int > norm1_SIN;
 
   // direction of the line  with respect to the frame o2
-  dg::SignalPtr< ml::Vector,int > norm2_SIN;
+  dg::SignalPtr< ml::Vector,int > versor2_SIN;
 
 private:
   virtual void updateInputValues(KDL::Expression<double>::Ptr Soutput, int time);
