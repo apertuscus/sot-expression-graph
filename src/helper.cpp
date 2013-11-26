@@ -51,7 +51,6 @@ Expression<double>::Ptr point_point_distance(const Point & p1,const Point &  p2)
 }
 Expression<double>::Ptr line_point_distance(const Point &  p, const Line & l)
 {
-	//i express everything in the line frame (l.o)
 	Expression<Vector>::Ptr dist_vect=ExpressOriginInBase(l) - ExpressInBase(p); //vector from l.p to p.p (in common frame)
 	Expression<Vector>::Ptr l_dir=ExpressDirectionInBase(l); //direction vector in common frame
 	// TODO check that l_dir is still a versor...
@@ -64,9 +63,8 @@ Expression<double>::Ptr line_point_distance(const Point &  p, const Line & l)
 }
 Expression<double>::Ptr projection_of_point_on_line(const Point &  p, const Line & l)
 {
-	//i express everything in the line frame (l.o)
-	Expression<Vector>::Ptr dist_vect=l.p - inv(l.o)*p.o*p.p; //vector from l.p to p.p (in common frame)
-	Expression<Vector>::Ptr l_dir=l.dir; //direction vector in common frame
+	Expression<Vector>::Ptr dist_vect= ExpressInBase(p)-ExpressOriginInBase(l) ; //vector from l.p to p.p (in common frame)
+	Expression<Vector>::Ptr l_dir=ExpressDirectionInBase(l); //direction vector in common frame
 	// TODO check that l_dir is still a versor...
 	// TODO check if it works!
 	//l_dir=l_dir*(Constant<double>(1.0)/norm(l_dir));
