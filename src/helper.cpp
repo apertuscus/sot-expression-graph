@@ -73,7 +73,7 @@ Expression<double>::Ptr projection_of_point_on_line(const Point &  p, const Line
 	Expression<double>::Ptr proj=dot(dist_vect,l_dir);
 	return proj;
 }
-Expression<double>::Ptr distance_from_lines (const Line &  l1, const Line & l2)
+Expression<double>::Ptr line_line_distance (const Line &  l1, const Line & l2)
 {
 	/*bring all in common coordinates
 	 * 	using the notation of
