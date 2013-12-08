@@ -121,6 +121,12 @@ computeJacobian( ml::Matrix& J,int time )
   //resize the matrices
   evaluateJacobian(J, Soutput_, time);
 
+  // WARNING: DIVERGE WHEN Error equals 0
+  if (isnan(J(0,0)))
+    J=Jprev_;
+  else
+    Jprev_=J;
+
   sotDEBUG(15)<<"# Out }"<<endl;
   return J;
 }
@@ -137,6 +143,8 @@ FeatureVersorToVersor::computeError( ml::Vector& res,int time )
   res.resize(1);
   //evaluate the result.
   res(0) = Soutput_->value();
+  if (isnan(res(0)))
+    res(0)=0;
 
   sotDEBUGOUT(15);
   return res ;

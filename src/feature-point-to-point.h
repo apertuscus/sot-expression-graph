@@ -18,8 +18,8 @@
  * with sot-core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOT_FEATURE_VERSOR_TO_VERSOR_HH__
-#define __SOT_FEATURE_VERSOR_TO_VERSOR_HH__
+#ifndef __SOT_FEATURE_POINT_TO_POINT_HH__
+#define __SOT_FEATURE_POINT_TO_POINT_HH__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -40,12 +40,12 @@
 
 #if defined (WIN32)
 #  if defined (feature_vector3_EXPORTS)
-#    define SOTFeatureVersorToVersor_EXPORT __declspec(dllexport)
+#    define SOTFeaturePointToPoint_EXPORT __declspec(dllexport)
 #  else
-#    define SOTFeatureVersorToVersor_EXPORT __declspec(dllimport)
+#    define SOTFeaturePointToPoint_EXPORT __declspec(dllimport)
 #  endif
 #else
-#  define SOTFeatureVersorToVersor_EXPORT
+#  define SOTFeaturePointToPoint_EXPORT
 #endif
 
 /* --------------------------------------------------------------------- */
@@ -56,10 +56,10 @@ namespace dynamicgraph { namespace sot {
 namespace dg = dynamicgraph;
 
 /*!
-  \class FeatureVersorToVersor
+  \class FeaturePointToPoint
   \brief Class that defines example of expression graps
 */
-class FeatureVersorToVersor
+class FeaturePointToPoint
 : public FeatureExprGraphAbstract
 {
 public:
@@ -69,8 +69,8 @@ public:
   DECLARE_NO_REFERENCE;
 
 public:
-  FeatureVersorToVersor( const std::string& name );
-  virtual ~FeatureVersorToVersor( void ) {}
+  FeaturePointToPoint( const std::string& name );
+  virtual ~FeaturePointToPoint( void ) {}
 
   virtual unsigned int& getDimension( unsigned int & dim, int time );
 
@@ -78,19 +78,21 @@ public:
   virtual ml::Matrix& computeJacobian( ml::Matrix& res,int time );
 
 public:
-  // versor  1 with respect to the frame o1
-  dg::SignalPtr< ml::Vector,int > v1_SIN;
+  // position of the point with respect to the frame o1
+  dg::SignalPtr< ml::Vector,int > p1_SIN;
 
-  // versor 2 with respect to the frame o2
-  dg::SignalPtr< ml::Vector,int > v2_SIN;
+  // position of the point with respect to the frame o2
+  dg::SignalPtr< ml::Vector,int > p2_SIN;
+
+  dg::SignalPtr< ml::Vector,int > referenceVector_SIN;
 
 private:
-  virtual void updateInputValues(KDL::Expression<double>::Ptr Soutput, int time);
+  virtual void updateInputValues(KDL::Expression<KDL::Vector>::Ptr Soutput, int time);
+
+  void evaluateJacobian( ml::Matrix& res, KDL::Expression<KDL::Vector>::Ptr Soutput, int time);
 
 private:
-  KDL::Expression<double>::Ptr Soutput_;
-  ml::Matrix Jprev_;
-
+  KDL::Expression<KDL::Vector>::Ptr Soutput_;
 } ;
 
 } /* namespace sot */} /* namespace dynamicgraph */
