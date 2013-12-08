@@ -110,33 +110,37 @@ evaluateJacobian( ml::Matrix& res, KDL::Expression<double>::Ptr Soutput, int tim
 {
   const MatrixHomogeneous &  w_Tm_o1=  w_T_o1_SIN (time);
   const MatrixHomogeneous &  w_Tm_o2=  w_T_o2_SIN (time);
-  const ml::Matrix & w_J_o1 = w_J_o1_SIN(time);
-  ml::Matrix Jtask1(1,6);
-  ml::Matrix ad1(6,6);
 
-  //compute the interaction matrices, that are expressed one in o1 applied
-  for (int i=0;i<6;++i)
-    Jtask1(0,i)=Soutput->derivative(i);
+  if(w_J_o1_SIN.isPlugged())
+  {
+    const ml::Matrix & w_J_o1 = w_J_o1_SIN(time);
+    ml::Matrix Jtask1(1,6);
+    ml::Matrix ad1(6,6);
 
-  //multiplication!
-  /*
-   * we need the inverse of the adjoint matrix that brings
-   * from o1(o2) frame to w
-   * this is equal to the adjoint from w to o1(o2)
-   * the matrix is then composed by
-   * w_R_o1| 0
-   * ------+-----
-   *   0   |w_R_o1
-   *    */
-  ad1.setZero();//inverse of ad
+    //compute the interaction matrices, that are expressed one in o1 applied
+    for (int i=0;i<6;++i)
+      Jtask1(0,i)=Soutput->derivative(i);
 
-  for (int i=0;i<3;i++)
-    for (int j=0;j<3;j++)
-      ad1(i,j) = ad1(i+3,j+3) = w_Tm_o1(i,j);
+    //multiplication!
+    /*
+     * we need the inverse of the adjoint matrix that brings
+     * from o1(o2) frame to w
+     * this is equal to the adjoint from w to o1(o2)
+     * the matrix is then composed by
+     * w_R_o1| 0
+     * ------+-----
+     *   0   |w_R_o1
+     *    */
+    ad1.setZero();//inverse of ad
 
-  res = Jtask1*ad1*w_J_o1;
+    for (int i=0;i<3;i++)
+      for (int j=0;j<3;j++)
+        ad1(i,j) = ad1(i+3,j+3) = w_Tm_o1(i,j);
 
-  if(w_J_o2_SIN.isPluged())
+    res = Jtask1*ad1*w_J_o1;
+  }
+
+  if(w_J_o2_SIN.isPlugged())
   {
     const ml::Matrix & w_J_o2 = w_J_o2_SIN(time);
     ml::Matrix Jtask2(1,6);
@@ -151,7 +155,10 @@ evaluateJacobian( ml::Matrix& res, KDL::Expression<double>::Ptr Soutput, int tim
       for (int j=0;j<3;j++)
         ad2(i,j) = ad2(i+3,j+3) = w_Tm_o2(i,j);
 
-    res += Jtask2*ad2*w_J_o2;
+    if(w_J_o1_SIN.isPlugged())
+      res += Jtask2*ad2*w_J_o2;
+    else
+      res = Jtask2*ad2*w_J_o2;
   }
 }
 
@@ -165,7 +172,7 @@ bool FeatureExprGraphAbstract::readVersorVector(
 		const KDL::Expression<double>::Ptr & exp,
 		const int time)
 {
-	if(SIN.isPluged())
+	if(SIN.isPlugged())
 	  {
 	    const ml::Vector & p = SIN(time);
 	    for( int i=0;i<3;++i )
