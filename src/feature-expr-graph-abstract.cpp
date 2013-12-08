@@ -51,21 +51,19 @@ FeatureExprGraphAbstract( const string& name )
   ,w_T_o2_SIN( NULL,"FeatureExprGraphAbstract("+name+")::input(matrixHomo)::w_T_o2" )
   ,w_J_o1_SIN( NULL,"sotFeatureExprGraphAbstract("+name+")::input(matrix)::w_J_o1" )
   ,w_J_o2_SIN( NULL,"sotFeatureExprGraphAbstract("+name+")::input(matrix)::w_J_o2" )
-  ,referenceSIN( NULL,"sotFeatureExprGraphAbstract("+name+")::input(double)::reference" )
 {
   //the jacobian depends by
   jacobianSOUT.addDependency( w_T_o1_SIN );
   jacobianSOUT.addDependency( w_T_o2_SIN );
   jacobianSOUT.addDependency( w_J_o1_SIN );
   jacobianSOUT.addDependency( w_J_o2_SIN );
-  jacobianSOUT.addDependency( referenceSIN );//this one is not probably necessary...
+
   //the output depends by
   errorSOUT.addDependency( w_T_o1_SIN );
   errorSOUT.addDependency( w_T_o2_SIN );
-  errorSOUT.addDependency( referenceSIN );
 
   signalRegistration( w_T_o1_SIN<<w_T_o2_SIN
-                      <<w_J_o1_SIN<<w_J_o2_SIN<<referenceSIN );
+                      <<w_J_o1_SIN<<w_J_o2_SIN);
 
   /***
    * init of expression graph
@@ -78,8 +76,6 @@ FeatureExprGraphAbstract( const string& name )
   Expression<KDL::Rotation>::Ptr w_R_O2= inputRot(9);
   //frame of the the object, w.r.t the same world frame
   w_T_o2= frame(w_R_O2,  w_p_o2);
-  //in and out
-  Sreference= input(12);
 }
 
 
@@ -89,7 +85,6 @@ FeatureExprGraphAbstract::updateInputValues(KDL::Expression<double>::Ptr Soutput
   //read signals!
   const MatrixHomogeneous &  w_Tm_o1=  w_T_o1_SIN (time);
   const MatrixHomogeneous &  w_Tm_o2=  w_T_o2_SIN (time);
-  const double & vectdes = referenceSIN(time);
   //copy positions
   for( int i=0;i<3;++i )
   {
@@ -100,8 +95,6 @@ FeatureExprGraphAbstract::updateInputValues(KDL::Expression<double>::Ptr Soutput
   //TODO use variable type for not controllable objects
   Soutput->setInputValue(3,mlHom2KDLRot(w_Tm_o1));
   Soutput->setInputValue(9,mlHom2KDLRot(w_Tm_o2));
-  //copy reference
-  Soutput->setInputValue(12,vectdes);
 }
 
 
@@ -188,6 +181,4 @@ bool FeatureExprGraphAbstract::readVersorVector(
 	  }
 
 }
-
-
 

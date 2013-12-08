@@ -84,6 +84,9 @@ public:
   // normal of the surface (expressed in the frame of the surface)
   dg::SignalPtr< ml::Vector,int > normalSIN;
 
+  // reference
+  dg::SignalPtr< double,int > referenceSIN;
+
 // internal data (to avoid memory allocation)
 private:
   ml::Matrix jacobian_;

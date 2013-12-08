@@ -90,6 +90,9 @@ public:
   // direction of the line  with respect to the frame o2
   dg::SignalPtr< ml::Vector,int > norm2_SIN;
 
+  // reference
+  dg::SignalPtr< double,int > referenceSIN;
+
 private:
   virtual void updateInputValues(KDL::Expression<double>::Ptr Soutput, int time);
 

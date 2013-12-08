@@ -70,8 +70,7 @@ struct Plane
 
 /*for all the expressions we soppose that the frames are expressed in a common reference*/
 Expression<double>::Ptr point_point_distance(const Point & p1,const Point& p2);
-Expression<KDL::Vector>::Ptr point_point_difference(const Point & p1, const Point & p2,
-		const Expression<KDL::Vector>::Ptr &positionTarget);
+Expression<KDL::Vector>::Ptr point_point_difference(const Point & p1, const Point & p2);
 Expression<double>::Ptr line_point_distance(const Point&  p, const Line& l);
 Expression<double>::Ptr projection_of_point_on_line(const Point& p, const Line& l);
 Expression<double>::Ptr line_line_distance (const Line& l1, const Line& l2);

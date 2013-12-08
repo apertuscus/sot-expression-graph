@@ -84,7 +84,7 @@ public:
   // position of the point with respect to the frame o2
   dg::SignalPtr< ml::Vector,int > p2_SIN;
 
-  dg::SignalPtr< ml::Vector,int > referenceVector_SIN;
+  dg::SignalPtr< ml::Vector,int > referenceSIN;
 
 private:
   virtual void updateInputValues(KDL::Expression<KDL::Vector>::Ptr Soutput, int time);

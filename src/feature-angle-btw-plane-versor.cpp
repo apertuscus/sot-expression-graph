@@ -52,6 +52,7 @@ FeatureAngleBtwPlaneAndVersor( const string& name )
 , p1_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::p1" )
 , norm1_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::norm1" )
 , versor2_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::v2" )
+, referenceSIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(double)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
@@ -62,8 +63,9 @@ FeatureAngleBtwPlaneAndVersor( const string& name )
   errorSOUT.addDependency( p1_SIN );
   errorSOUT.addDependency( norm1_SIN );
   errorSOUT.addDependency( versor2_SIN );
+  errorSOUT.addDependency( referenceSIN );
 
-  signalRegistration( p1_SIN  <<norm1_SIN<<versor2_SIN);
+  signalRegistration( p1_SIN  <<norm1_SIN<<versor2_SIN << referenceSIN);
 
   Expression<KDL::Vector>::Ptr p1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX),
@@ -85,7 +87,7 @@ FeatureAngleBtwPlaneAndVersor( const string& name )
 
   geometric_primitive::Versor versor ;
   versor.o=w_T_o2;versor.v=versor2;
-  Soutput_=Sreference-geometric_primitive::angle_btw_plane_and_versor(plane,versor);
+  Soutput_ = geometric_primitive::angle_btw_plane_and_versor(plane,versor);
 
   //end init
 }
@@ -143,11 +145,12 @@ ml::Vector&
 FeatureAngleBtwPlaneAndVersor::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
+  double reference = referenceSIN(time);
   updateInputValues(Soutput_, time);
 
   res.resize(1);
   //evaluate the result.
-  res(0) = Soutput_->value();
+  res(0) = Soutput_->value() - reference;
 
   sotDEBUGOUT(15);
   return res ;

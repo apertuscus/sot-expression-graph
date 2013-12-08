@@ -129,13 +129,12 @@ Expression<double>::Ptr point_point_distance(const Point & p1,const Point &  p2)
 	//return norm(p1.p - inv(p1.o)*p2.o*p2.p);
 }
 
-Expression<Vector>::Ptr point_point_difference(const Point & p1,const Point & p2,
-    const Expression<KDL::Vector>::Ptr & positionTarget = KDL::Constant((KDL::Vector(0,0,0))))
+Expression<Vector>::Ptr point_point_difference(const Point & p1,const Point & p2)
 {
   Expression<Vector>::Ptr v1=ExpressInBase(p1);
   Expression<Vector>::Ptr v2=ExpressInBase(p2);
 
-  return ((v2-v1)-positionTarget);
+  return (v2-v1);
 }
 
 Expression<double>::Ptr line_point_distance(const Point &  p, const Line & l)

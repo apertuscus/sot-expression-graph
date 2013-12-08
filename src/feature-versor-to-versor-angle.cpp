@@ -51,6 +51,7 @@ FeatureVersorToVersor( const string& name )
 : FeatureExprGraphAbstract( name )
 , v1_SIN( NULL,"FeatureVersorToVersor("+name+")::input(vector)::v1" )
 , v2_SIN( NULL,"FeatureVersorToVersor("+name+")::input(vector)::v2" )
+, referenceSIN( NULL,"FeatureVersorToVersor("+name+")::input(double)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( v1_SIN );
@@ -59,8 +60,9 @@ FeatureVersorToVersor( const string& name )
   //the output depends by
   errorSOUT.addDependency( v1_SIN );
   errorSOUT.addDependency( v2_SIN );
+  errorSOUT.addDependency( referenceSIN );
 
-  signalRegistration( v1_SIN << v2_SIN );
+  signalRegistration( v1_SIN << v2_SIN << referenceSIN );
 
   Expression<KDL::Vector>::Ptr p1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX),
@@ -75,7 +77,7 @@ FeatureVersorToVersor( const string& name )
   geometric_primitive::Versor versor1;  versor1.o=w_T_o1;  versor1.v= p1;
   geometric_primitive::Versor versor2;  versor2.o=w_T_o2;  versor2.v= p2;
 
-  Soutput_=Sreference-geometric_primitive::angle_btw_versors(versor1,versor2);
+  Soutput_=geometric_primitive::angle_btw_versors(versor1,versor2);
 
   //end init
 }
@@ -138,6 +140,7 @@ ml::Vector&
 FeatureVersorToVersor::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
+  double reference = referenceSIN(time);
   updateInputValues(Soutput_, time);
 
   res.resize(1);
@@ -146,6 +149,7 @@ FeatureVersorToVersor::computeError( ml::Vector& res,int time )
   if (isnan(res(0)))
     res(0)=0;
 
+  res(0) -= reference;
   sotDEBUGOUT(15);
   return res ;
 }

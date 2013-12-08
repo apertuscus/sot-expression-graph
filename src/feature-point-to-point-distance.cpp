@@ -51,6 +51,7 @@ FeaturePointToPointDistance( const string& name )
 : FeatureExprGraphAbstract( name )
 , p1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p2" )
+, referenceSIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(double)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
@@ -59,8 +60,9 @@ FeaturePointToPointDistance( const string& name )
   //the output depends by
   errorSOUT.addDependency( p1_SIN );
   errorSOUT.addDependency( p2_SIN );
+  errorSOUT.addDependency( referenceSIN );
 
-  signalRegistration( p1_SIN << p2_SIN );
+  signalRegistration( p1_SIN << p2_SIN << referenceSIN);
 
   Expression<KDL::Vector>::Ptr p1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX),
@@ -75,7 +77,7 @@ FeaturePointToPointDistance( const string& name )
   geometric_primitive::Point point1;  point1.o=w_T_o1;  point1.p= p1;
   geometric_primitive::Point point2;  point2.o=w_T_o2;  point2.p= p2;
 
-  Soutput_=Sreference-geometric_primitive::point_point_distance(point1,point2);
+  Soutput_ = geometric_primitive::point_point_distance(point1,point2);
 
   //end init
 }
@@ -132,11 +134,12 @@ ml::Vector&
 FeaturePointToPointDistance::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
+  double reference = referenceSIN(time);
   updateInputValues(Soutput_, time);
 
   res.resize(1);
   //evaluate the result.
-  res(0) = Soutput_->value();
+  res(0) = Soutput_->value() - reference;
   std::cout << getName() << "  " << res(0) << std::endl;
   sotDEBUGOUT(15);
   return res ;

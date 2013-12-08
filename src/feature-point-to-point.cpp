@@ -51,19 +51,18 @@ FeaturePointToPoint( const string& name )
 : FeatureExprGraphAbstract( name )
 , p1_SIN( NULL,"FeaturePointToPoint("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"FeaturePointToPoint("+name+")::input(vector)::p2" )
-, referenceVector_SIN( NULL,"FeaturePointToPoint("+name+")::input(vector)::referenceVector" )
+, referenceSIN( NULL,"FeaturePointToPoint("+name+")::input(vector)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
   jacobianSOUT.addDependency( p2_SIN );
-  jacobianSOUT.addDependency( referenceVector_SIN );
 
   //the output depends by
   errorSOUT.addDependency( p1_SIN );
   errorSOUT.addDependency( p2_SIN );
-  errorSOUT.addDependency( referenceVector_SIN );
+  errorSOUT.addDependency( referenceSIN );
 
-  signalRegistration( p1_SIN << p2_SIN << referenceVector_SIN);
+  signalRegistration( p1_SIN << p2_SIN << referenceSIN);
 
   Expression<KDL::Vector>::Ptr p1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX),
@@ -74,16 +73,11 @@ FeaturePointToPoint( const string& name )
 		  input(EXP_GRAPH_BASE_INDEX+4),
 		  input(EXP_GRAPH_BASE_INDEX+5));
 
-	Expression<KDL::Vector>::Ptr refVector = KDL::vector(
-			input(EXP_GRAPH_BASE_INDEX+6),
-			input(EXP_GRAPH_BASE_INDEX+7),
-			input(EXP_GRAPH_BASE_INDEX+8));
-
   /*here goes the expressions!!!*/
   geometric_primitive::Point point1;  point1.o=w_T_o1;  point1.p= p1;
   geometric_primitive::Point point2;  point2.o=w_T_o2;  point2.p= p2;
 
-  Soutput_=geometric_primitive::point_point_difference(point1,point2, refVector);
+  Soutput_=geometric_primitive::point_point_difference(point1,point2);
 
   //end init
 }
@@ -117,7 +111,7 @@ void FeaturePointToPoint::updateInputValues(KDL::Expression<KDL::Vector>::Ptr So
   //read signals!
   const MatrixHomogeneous &  w_Tm_o1=  w_T_o1_SIN (time);
   const MatrixHomogeneous &  w_Tm_o2=  w_T_o2_SIN (time);
-  const double & vectdes = referenceSIN(time);
+
   //copy positions
   for( int i=0;i<3;++i )
   {
@@ -128,13 +122,9 @@ void FeaturePointToPoint::updateInputValues(KDL::Expression<KDL::Vector>::Ptr So
   //TODO use variable type for not controllable objects
   Soutput->setInputValue(3,mlHom2KDLRot(w_Tm_o1));
   Soutput->setInputValue(9,mlHom2KDLRot(w_Tm_o2));
-  //copy reference
-  Soutput->setInputValue(12,vectdes);
-
 
   readPositionVector(p1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
   readPositionVector(p2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);
-  readPositionVector(referenceVector_SIN,EXP_GRAPH_BASE_INDEX+6,Soutput,time);
 }
 
 
@@ -236,12 +226,13 @@ computeJacobian( ml::Matrix& J,int time )
 ml::Vector&
 FeaturePointToPoint::computeError( ml::Vector& res,int time )
 {
-  const Flags & selec = selectionSIN(time);
-
   sotDEBUGIN(15);
+  const Flags & selec = selectionSIN(time);
+  ml::Vector reference = referenceSIN(time);
+
   updateInputValues(Soutput_, time);
 
-  res= convert(Soutput_->value(),selec, dimensionSOUT(time));
+  res= convert(Soutput_->value(),selec, dimensionSOUT(time)) - reference;
   sotDEBUGOUT(15);
   return res ;
 }

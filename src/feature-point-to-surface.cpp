@@ -52,6 +52,7 @@ FeaturePointToSurface( const string& ExpressionGraph )
 , p1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p2" )
 , normalSIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::normal_o2" )
+, referenceSIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(double)::reference" )
 {
   //the jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
@@ -145,10 +146,12 @@ ml::Vector&
 FeaturePointToSurface::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
+  double reference = referenceSIN(time);
+
   int dummy = 0;
   oneStepOfControl(dummy, time);
 
-  res = error_;
+  res = error_ - reference;
 
   sotDEBUGOUT(15);
   return res ;

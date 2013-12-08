@@ -33,8 +33,9 @@
 
 #include <kdl/expressiontree.hpp>
 
+// TODO
 //start using new input values from this value (zero index is ok!)
-#define EXP_GRAPH_BASE_INDEX 13
+#define EXP_GRAPH_BASE_INDEX 12
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -56,7 +57,6 @@ protected:
   /*variables for expression graphs */
   KDL::Expression<KDL::Frame>::Ptr w_T_o1;
   KDL::Expression<KDL::Frame>::Ptr w_T_o2;
-  KDL::Expression<double>::Ptr Sreference;
   //end
 
   /* --- SIGNALS ------------------------------------------------------------ */
@@ -71,8 +71,6 @@ public:
   dg::SignalPtr< MatrixHomogeneous,int > w_T_o2_SIN;
   //robot jacobian w_J_o1
   dg::SignalPtr< ml::Matrix,int > w_J_o2_SIN;
-
-  dg::SignalPtr< double,int > referenceSIN;
 
  public:
   FeatureExprGraphAbstract( const std::string& name );

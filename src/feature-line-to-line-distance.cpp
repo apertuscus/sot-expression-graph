@@ -53,6 +53,7 @@ FeatureLineToLineDistance( const string& name )
 , p2_SIN( NULL,"FeatureLineToLineDistance("+name+")::input(vector)::p2" )
 , dir1_SIN( NULL,"FeatureLineToLineDistance("+name+")::input(vector)::dir1" )
 , dir2_SIN( NULL,"FeatureLineToLineDistance("+name+")::input(vector)::dir2" )
+, referenceSIN( NULL,"FeatureLineToLineDistance("+name+")::input(double)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
@@ -65,8 +66,9 @@ FeatureLineToLineDistance( const string& name )
   errorSOUT.addDependency( p2_SIN );
   errorSOUT.addDependency( dir1_SIN );
   errorSOUT.addDependency( dir2_SIN );
+  errorSOUT.addDependency( referenceSIN );
 
-  signalRegistration( p1_SIN << p2_SIN <<dir1_SIN<<dir2_SIN);
+  signalRegistration( p1_SIN << p2_SIN <<dir1_SIN<<dir2_SIN << referenceSIN);
 
   Expression<KDL::Vector>::Ptr p1 = KDL::vector(
 		  input(EXP_GRAPH_BASE_INDEX),
@@ -91,7 +93,7 @@ FeatureLineToLineDistance( const string& name )
 
   geometric_primitive::Line line2 ;
   line2.o=w_T_o2;line2.p=p2;line2.dir=dir2;
-  Soutput_=Sreference-geometric_primitive::line_line_distance(line1,line2);
+  Soutput_ = geometric_primitive::line_line_distance(line1,line2);
 
   //end init
 }
@@ -124,7 +126,6 @@ void FeatureLineToLineDistance::updateInputValues(KDL::Expression<double>::Ptr S
   readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (dir1_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (dir2_SIN,EXP_GRAPH_BASE_INDEX+9,	Soutput,time);
-
 }
 
 
@@ -151,11 +152,13 @@ ml::Vector&
 FeatureLineToLineDistance::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
+  double reference = referenceSIN(time);
+
   updateInputValues(Soutput_, time);
 
   res.resize(1);
   //evaluate the result.
-  res(0) = Soutput_->value();
+  res(0) = Soutput_->value() - reference;
 
   sotDEBUGOUT(15);
   return res ;
