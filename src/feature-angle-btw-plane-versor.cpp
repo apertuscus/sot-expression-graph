@@ -114,10 +114,9 @@ void FeatureAngleBtwPlaneAndVersor::updateInputValues(KDL::Expression<double>::P
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
   //same order that in the constructor!
-  FeatureExprGraphAbstract::readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
+  readPositionVector(p1_SIN, EXP_GRAPH_BASE_INDEX, Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (norm1_SIN,EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (versor2_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
-
 }
 
 

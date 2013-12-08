@@ -120,8 +120,8 @@ void FeatureLineToLineDistance::updateInputValues(KDL::Expression<double>::Ptr S
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
   //same order that in the constructor!
-  FeatureExprGraphAbstract::readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
-  FeatureExprGraphAbstract::readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
+  readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
+  readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (dir1_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (dir2_SIN,EXP_GRAPH_BASE_INDEX+9,	Soutput,time);
 

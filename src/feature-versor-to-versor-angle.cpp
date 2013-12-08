@@ -104,8 +104,8 @@ void FeatureVersorToVersor::updateInputValues(KDL::Expression<double>::Ptr Soutp
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
 
-  FeatureExprGraphAbstract::readPositionVector(v1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
-  FeatureExprGraphAbstract::readPositionVector(v2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);
+  readPositionVector(v1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
+  readPositionVector(v2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);
 }
 
 

@@ -111,8 +111,8 @@ getDimension( unsigned int & dim, int /*time*/ )
 void FeaturePointToLinePrj::updateInputValues(KDL::Expression<double>::Ptr Soutput, int time)
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
-  FeatureExprGraphAbstract::readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
-  FeatureExprGraphAbstract::readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
+  readPositionVector(p1_SIN,	EXP_GRAPH_BASE_INDEX, 	Soutput,time);
+  readPositionVector(p2_SIN,	EXP_GRAPH_BASE_INDEX+3,	Soutput,time);
   FeatureExprGraphAbstract::readVersorVector  (dir2_SIN,EXP_GRAPH_BASE_INDEX+6,	Soutput,time);
 
 }
