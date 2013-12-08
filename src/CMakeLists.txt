@@ -12,7 +12,7 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   feature-expressionGraph.cpp
   feature-expressionFullGraph.cpp
   feature-expr-graph-abstract.cpp
-  feature-point-to-point.cpp
+  feature-point-to-point-distance.cpp
   feature-point-to-surface.cpp
   feature-point-to-line-distance.cpp
   feature-line-to-line-distance.cpp	

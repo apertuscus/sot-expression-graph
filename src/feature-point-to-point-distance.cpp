@@ -26,7 +26,7 @@
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
-#include "feature-point-to-point.h"
+#include "feature-point-to-point-distance.h"
 #include "helper.h"
 #include <sot/core/exception-feature.hh>
 
@@ -40,14 +40,14 @@ using namespace dynamicgraph;
 using namespace KDL;
 using namespace std;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeaturePointToPoint,"FeaturePointToPoint");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeaturePointToPointDistance,"FeaturePointToPointDistance");
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-FeaturePointToPoint::
-FeaturePointToPoint( const string& name )
+FeaturePointToPointDistance::
+FeaturePointToPointDistance( const string& name )
 : FeatureExprGraphAbstract( name )
 , p1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p2" )
@@ -85,7 +85,7 @@ FeaturePointToPoint( const string& name )
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-unsigned int& FeaturePointToPoint::
+unsigned int& FeaturePointToPointDistance::
 getDimension( unsigned int & dim, int /*time*/ )
 {
   sotDEBUG(25)<<"# In {"<<endl;
@@ -100,16 +100,16 @@ getDimension( unsigned int & dim, int /*time*/ )
  * the possible features.
  */
 
-void FeaturePointToPoint::updateInputValues(KDL::Expression<double>::Ptr Soutput, int time)
+void FeaturePointToPointDistance::updateInputValues(KDL::Expression<double>::Ptr Soutput, int time)
 {
   FeatureExprGraphAbstract::updateInputValues(Soutput, time);
 
-  FeatureExprGraphAbstract::readPositionVector(p1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
-  FeatureExprGraphAbstract::readPositionVector(p2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);
+  readPositionVector(p1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
+  readPositionVector(p2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);
 }
 
 
-ml::Matrix& FeaturePointToPoint::
+ml::Matrix& FeaturePointToPointDistance::
 computeJacobian( ml::Matrix& J,int time )
 {
   sotDEBUG(15)<<"# In {"<<endl;
@@ -129,7 +129,7 @@ computeJacobian( ml::Matrix& J,int time )
 *a the possible features.
  */
 ml::Vector&
-FeaturePointToPoint::computeError( ml::Vector& res,int time )
+FeaturePointToPointDistance::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
   updateInputValues(Soutput_, time);
@@ -137,7 +137,7 @@ FeaturePointToPoint::computeError( ml::Vector& res,int time )
   res.resize(1);
   //evaluate the result.
   res(0) = Soutput_->value();
-
+  std::cout << getName() << "  " << res(0) << std::endl;
   sotDEBUGOUT(15);
   return res ;
 }

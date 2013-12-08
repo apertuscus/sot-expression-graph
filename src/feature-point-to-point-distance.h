@@ -18,8 +18,8 @@
  * with sot-core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOT_FEATURE_POINT_TO_POINT_HH__
-#define __SOT_FEATURE_POINT_TO_POINT_HH__
+#ifndef __SOT_FEATURE_DISTANCE_POINT_TO_POINT_HH__
+#define __SOT_FEATURE_DISTANCE_POINT_TO_POINT_HH__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -40,12 +40,12 @@
 
 #if defined (WIN32)
 #  if defined (feature_vector3_EXPORTS)
-#    define SOTFeaturePointToPoint_EXPORT __declspec(dllexport)
+#    define SOTFeaturePointToPointDistance_EXPORT __declspec(dllexport)
 #  else
-#    define SOTFeaturePointToPoint_EXPORT __declspec(dllimport)
+#    define SOTFeaturePointToPointDistance_EXPORT __declspec(dllimport)
 #  endif
 #else
-#  define SOTFeaturePointToPoint_EXPORT
+#  define SOTFeaturePointToPointDistance_EXPORT
 #endif
 
 /* --------------------------------------------------------------------- */
@@ -56,10 +56,10 @@ namespace dynamicgraph { namespace sot {
 namespace dg = dynamicgraph;
 
 /*!
-  \class FeaturePointToPoint
+  \class FeaturePointToPointDistance
   \brief Class that defines example of expression graps
 */
-class FeaturePointToPoint
+class FeaturePointToPointDistance
 : public FeatureExprGraphAbstract
 {
 public:
@@ -69,8 +69,8 @@ public:
   DECLARE_NO_REFERENCE;
 
 public:
-  FeaturePointToPoint( const std::string& name );
-  virtual ~FeaturePointToPoint( void ) {}
+  FeaturePointToPointDistance( const std::string& name );
+  virtual ~FeaturePointToPointDistance( void ) {}
 
   virtual unsigned int& getDimension( unsigned int & dim, int time );
 
