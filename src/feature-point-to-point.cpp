@@ -185,7 +185,7 @@ evaluateJacobian( ml::Matrix& res, KDL::Expression<KDL::Vector>::Ptr Soutput, in
     unsigned index2 = 0;
     for (int j=0;j<3;++j)
     {
-      if(fl(index2))
+      if(fl(j))
       {
         for (int i=0;i<6;++i)
           Jtask2(index2,i)=Soutput->derivative(i+6)[j];
