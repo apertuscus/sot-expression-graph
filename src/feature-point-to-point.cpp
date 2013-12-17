@@ -108,20 +108,8 @@ getDimension( unsigned int & dim, int time)
 
 void FeaturePointToPoint::updateInputValues(KDL::Expression<KDL::Vector>::Ptr Soutput, int time)
 {
-  //read signals!
-  const MatrixHomogeneous &  w_Tm_o1=  w_T_o1_SIN (time);
-  const MatrixHomogeneous &  w_Tm_o2=  w_T_o2_SIN (time);
-
-  //copy positions
-  for( int i=0;i<3;++i )
-  {
-    Soutput->setInputValue(i,w_Tm_o1.elementAt( i,3 ));
-    Soutput->setInputValue(i+6, w_Tm_o2.elementAt( i,3 ));
-  }
-  //copy rotations
-  //TODO use variable type for not controllable objects
-  Soutput->setInputValue(3,mlHom2KDLRot(w_Tm_o1));
-  Soutput->setInputValue(9,mlHom2KDLRot(w_Tm_o2));
+  readHomogeneousMatrix(w_T_o1_SIN, 0, Soutput,time);
+  readHomogeneousMatrix(w_T_o2_SIN, 6, Soutput,time);
 
   readPositionVector(p1_SIN,EXP_GRAPH_BASE_INDEX,	 Soutput,time);
   readPositionVector(p2_SIN,EXP_GRAPH_BASE_INDEX+3,Soutput,time);

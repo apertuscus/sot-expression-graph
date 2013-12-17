@@ -11,6 +11,13 @@ ml::Vector convert (const KDL::Vector &  v);
 ml::Vector convert (const KDL::Vector & v, const dynamicgraph::sot::Flags & fl, unsigned int dim);
 
 
+template<class T>
+bool readHomogeneousMatrix(
+    dynamicgraph::SignalPtr< dynamicgraph::sot::MatrixHomogeneous,int > & SIN,
+    unsigned int base,
+    const T & exp,
+    const int time);
+
 /*
  * readPositionVector:
  * given:
@@ -25,18 +32,12 @@ ml::Vector convert (const KDL::Vector & v, const dynamicgraph::sot::Flags & fl, 
  * if it is not plugged the vector is set to zero
  * TODO in future, test new data to avoid setInputValue on constant data.
  *  */
+template<class T>
 bool readPositionVector(
     dynamicgraph::SignalPtr< ml::Vector,int >& SIN,
     unsigned int base,
-    const KDL::Expression<double>::Ptr & exp,
+    const T & exp,
     const int time);
-
-bool readPositionVector(
-    dynamicgraph::SignalPtr< ml::Vector,int >& SIN,
-    unsigned int base,
-    const KDL::Expression<KDL::Vector>::Ptr & exp,
-    const int time);
-
 
 namespace geometric_primitive
 {
@@ -96,6 +97,9 @@ Expression<Vector>::Ptr ExpressOriginInBase(const Line & l);
 Expression<Vector>::Ptr ExpressDirectionInBase(const Plane & p);
 Expression<Vector>::Ptr ExpressDirectionInBase(const Line & l);
 }
+
+# include "helper.t.cpp"
+
 #endif // __SOT_FEATURE_EXPRESSIONGRAPH_HELPER_HH__
 
 

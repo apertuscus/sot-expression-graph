@@ -1,5 +1,7 @@
 #include "helper.h"
 using namespace KDL;
+namespace dgsot=dynamicgraph::sot;
+
 KDL::Rotation mlHom2KDLRot (const dynamicgraph::sot::MatrixHomogeneous &  M)
 {
 	KDL::Rotation Rkdl;
@@ -30,63 +32,6 @@ ml::Vector convert (const KDL::Vector & v, const dynamicgraph::sot::Flags & fl, 
       ++index;
     }
   return v2;
-}
-
-
-/*
- * readPositionVector:
- * given:
- * \param[in] 	SIN		the signal to be read (a vector of 3)
- * \param[in]	base	the base index that corresponds to the beginnini of the vector with the input value
- * \param[in]	exp		the expression in which the values should be copied
- * \param[in]	time	the time seed
- *
- * as a side effect it setInputValue of the given values, and
- *
- * \return	true if the signal SIN is plugged, false otherwise
- * if it is not plugged the vector is set to zero
- * TODO in future, test new data to avoid setInputValue on constant data.
- *  */
-bool readPositionVector(
-    dynamicgraph::SignalPtr< ml::Vector,int >& SIN,
-    unsigned int base,
-    const KDL::Expression<double>::Ptr & exp,
-    const int time)
-{
-  if(SIN.isPlugged())
-    {
-      const ml::Vector & p = SIN(time);
-      for( int i=0;i<3;++i )
-        exp->setInputValue(base+i, p(i));
-      return true;
-    }
-    else
-    {
-      for( int i=0;i<3;++i )
-        exp->setInputValue(base+i, 0);
-      return false;
-    }
-}
-
-bool readPositionVector(
-    dynamicgraph::SignalPtr< ml::Vector,int >& SIN,
-    unsigned int base,
-    const KDL::Expression<KDL::Vector>::Ptr & exp,
-    const int time)
-{
-  if(SIN.isPlugged())
-    {
-      const ml::Vector & p = SIN(time);
-      for( int i=0;i<3;++i )
-        exp->setInputValue(base+i, p(i));
-      return true;
-    }
-    else
-    {
-      for( int i=0;i<3;++i )
-        exp->setInputValue(base+i, 0);
-      return false;
-    }
 }
 
 /*
