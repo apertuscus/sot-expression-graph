@@ -12,15 +12,17 @@ ADD_LIBRARY(${CONTROLLER_NAME}
   feature-expressionGraph.cpp
   feature-expressionFullGraph.cpp
   feature-expr-graph-abstract.cpp
+
+  feature-line-to-line-distance.cpp
   feature-point-to-point-distance.cpp
-  feature-point-to-point.cpp
-  feature-point-to-surface.cpp
   feature-point-to-line-distance.cpp
-  feature-line-to-line-distance.cpp	
-  feature-versor-to-versor-angle.cpp	
-  feature-point-to-line-projection.cpp	
-  feature-angle-btw-planes.cpp
-  feature-angle-btw-plane-versor.cpp
+  feature-point-to-surface-distance.cpp
+  feature-point-to-point.cpp
+  feature-point-to-line-projection.cpp
+
+  feature-plane-to-plane-angle.cpp
+  feature-plane-to-versor-angle.cpp
+  feature-versor-to-versor-angle.cpp
   helper.cpp
 )
 

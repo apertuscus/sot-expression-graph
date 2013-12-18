@@ -35,11 +35,11 @@ def plugOperationalPoint(feature, index, op):
 
 
 
-def createFeatureAnglePlaneVersor(name, elmt1, elmt2):
+def createFeaturePlaneVersorAngle(name, elmt1, elmt2):
 	assert elmt1.typename == 'plane'
 	assert elmt2.typename == 'versor'
 
-	feature = FeatureAngleBtwPlaneAndVersor(name)
+	feature = FeaturePlaneToVersorAngle(name)
 
 	# Get the position/Jacobian of the operational point for the dynamic entity
 	plugOperationalPoint(feature, '1', elmt1)
@@ -59,11 +59,11 @@ def createFeatureAnglePlaneVersor(name, elmt1, elmt2):
 	return(task, feature)
 
 
-def createFeatureAngleVersorVersor(name, elmt1, elmt2):
+def createFeatureVersorVersorAngle(name, elmt1, elmt2):
 	assert elmt1.typename == 'versor'
 	assert elmt2.typename == 'versor'
 
-	feature = FeatureVersorToVersor(name)
+	feature = FeatureVersorToVersorAngle(name)
 
 	# Get the position/Jacobian of the operational point for the dynamic entity
 	plugOperationalPoint(feature, '1', elmt1)
@@ -110,20 +110,20 @@ def createTaskAndFeature(name, elmt1, elmt2, operation):
 	if operation == 'distance':
 		# line / line
 		if   elmt1.typename == 'line' and elmt2.typename == 'line':
-			return createFeatureDistanceLineLine(name, elmt1, elmt2)
+			return createFeatureLineLineDistance(name, elmt1, elmt2)
 		# point / surface
 		elif elmt1.typename == 'point' and elmt2.typename == 'surface':
-			return createFeatureDistanceSurfacePoint(name, elmt2, elmt1)
+			return createFeatureSurfacePointDistance(name, elmt2, elmt1)
 		elif elmt1.typename == 'surface' and elmt2.typename == 'point':
-			return createFeatureDistanceSurfacePoint(name, elmt1, elmt2)
+			return createFeatureSurfacePointDistance(name, elmt1, elmt2)
 		# point / line
 		elif elmt1.typename == 'line' and elmt2.typename == 'point':
-			return createFeatureDistanceLinePoint(name, elmt1, elmt2)
+			return createFeatureLinePointDistance(name, elmt1, elmt2)
 		elif elmt1.typename == 'point' and elmt2.typename == 'line':
-			return createFeatureDistanceLinePoint(name, elmt2, elmt1)
+			return createFeatureLinePointDistance(name, elmt2, elmt1)
 		# point / point
 		elif elmt1.typename == 'point' and elmt2.typename == 'point':
-			return createFeatureDistancePointPoint(name, elmt1, elmt2)
+			return createFeaturePointPointDistance(name, elmt1, elmt2)
 
 		# not handled.
 		else :
@@ -132,18 +132,18 @@ def createTaskAndFeature(name, elmt1, elmt2, operation):
 	elif operation == 'angle':
 		# plane / plane
 		if   elmt1.typename == 'plane' and elmt2.typename == 'plane':
-			return createFeatureAngleBtwPlaneAndPlane(name, elmt1, elmt2)
+			return createFeaturePlanePlaneAngle(name, elmt1, elmt2)
 		# plane / versor
 		elif elmt1.typename == 'plane' and elmt2.typename == 'versor':
-			return createFeatureAnglePlaneVersor(name, elmt1, elmt2)
+			return createFeaturePlaneVersorAngle(name, elmt1, elmt2)
 		elif elmt1.typename == 'versor' and elmt2.typename == 'plane':
-			return createFeatureAnglePlaneVersor(name, elmt1, elmt2)
+			return createFeaturePlaneVersorAngle(name, elmt1, elmt2)
 		# versor / versor
 		elif elmt1.typename == 'versor' and elmt2.typename == 'versor':
-			return createFeatureAngleVersorVersor(name, elmt1, elmt2)
+			return createFeatureVersorVersorAngle(name, elmt1, elmt2)
 		else:
 			print 'Unable to compute the angle between ' + elmt1.typename  + '/' + elmt2.typename 
 
 	else:
-			print "pouet"
+			print "operation " +  operation + " unknown"
 

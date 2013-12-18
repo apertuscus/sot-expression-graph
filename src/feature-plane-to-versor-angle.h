@@ -40,12 +40,12 @@
 
 #if defined (WIN32)
 #  if defined (feature_vector3_EXPORTS)
-#    define SOTFeatureAngleBtwPlaneAndVersor_EXPORT __declspec(dllexport)
+#    define SOTFeaturePlaneToVersorAngle_EXPORT __declspec(dllexport)
 #  else
-#    define SOTFeatureAngleBtwPlaneAndVersor_EXPORT __declspec(dllimport)
+#    define SOTFeaturePlaneToVersorAngle_EXPORT __declspec(dllimport)
 #  endif
 #else
-#  define SOTFeatureAngleBtwPlaneAndVersor_EXPORT
+#  define SOTFeaturePlaneToVersorAngle_EXPORT
 #endif
 
 /* --------------------------------------------------------------------- */
@@ -59,7 +59,7 @@ namespace dg = dynamicgraph;
   \class FeaturePointToLine
   \brief Class that defines example of expression graps
 */
-class FeatureAngleBtwPlaneAndVersor
+class FeaturePlaneToVersorAngle
 : public FeatureExprGraphAbstract
 {
 public:
@@ -69,8 +69,8 @@ public:
   DECLARE_NO_REFERENCE;
 
 public:
-  FeatureAngleBtwPlaneAndVersor( const std::string& name );
-  virtual ~FeatureAngleBtwPlaneAndVersor( void ) {}
+  FeaturePlaneToVersorAngle( const std::string& name );
+  virtual ~FeaturePlaneToVersorAngle( void ) {}
 
   virtual unsigned int& getDimension( unsigned int & dim, int time );
 

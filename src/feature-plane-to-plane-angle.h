@@ -59,7 +59,7 @@ namespace dg = dynamicgraph;
   \class FeaturePointToLine
   \brief Class that defines example of expression graps
 */
-class FeatureAngleBtwPlanes
+class FeaturePlaneToPlaneAngle
 : public FeatureExprGraphAbstract
 {
 public:
@@ -69,8 +69,8 @@ public:
   DECLARE_NO_REFERENCE;
 
 public:
-  FeatureAngleBtwPlanes( const std::string& name );
-  virtual ~FeatureAngleBtwPlanes( void ) {}
+  FeaturePlaneToPlaneAngle( const std::string& name );
+  virtual ~FeaturePlaneToPlaneAngle( void ) {}
 
   virtual unsigned int& getDimension( unsigned int & dim, int time );
 

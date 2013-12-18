@@ -41,10 +41,10 @@ namespace dynamicgraph { namespace sot {
 namespace dg = dynamicgraph;
 
 /*!
-  \class FeaturePointToSurface
+  \class FeaturePointToSurfaceDistance
   \brief
 */
-class FeaturePointToSurface
+class FeaturePointToSurfaceDistance
 : public FeatureExprGraphAbstract
 {
 
@@ -55,8 +55,8 @@ public:
   DECLARE_NO_REFERENCE;
 
 public:
- FeaturePointToSurface( const std::string& name );
- virtual ~FeaturePointToSurface( void ) {}
+ FeaturePointToSurfaceDistance( const std::string& name );
+ virtual ~FeaturePointToSurfaceDistance( void ) {}
 
  virtual unsigned int& getDimension( unsigned int & dim, int time );
 

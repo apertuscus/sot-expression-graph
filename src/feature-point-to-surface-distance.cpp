@@ -26,7 +26,7 @@
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
-#include "feature-point-to-surface.h"
+#include "feature-point-to-surface-distance.h"
 #include "helper.h"
 
 #include <sot/core/exception-feature.hh>
@@ -40,18 +40,18 @@ using namespace dynamicgraph;
 using namespace KDL;
 using namespace std;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeaturePointToSurface,"FeaturePointToSurface");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeaturePointToSurfaceDistance,"FeaturePointToSurfaceDistance");
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-FeaturePointToSurface::
-FeaturePointToSurface( const string& ExpressionGraph )
+FeaturePointToSurfaceDistance::
+FeaturePointToSurfaceDistance( const string& ExpressionGraph )
 : FeatureExprGraphAbstract( ExpressionGraph )
 , p1_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"sotFeaturePoint6d("+name+")::input(vector)::p2" )
-, normalSIN ( NULL,"FeaturePointToSurface("+name+")::input(matrixHomo)::normal_o2" )
+, normalSIN ( NULL,"FeaturePointToSurfaceDistance("+name+")::input(matrixHomo)::normal_o2" )
 , referenceSIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(double)::reference" )
 {
   //the jacobian depends by
@@ -87,7 +87,7 @@ FeaturePointToSurface( const string& ExpressionGraph )
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-unsigned int& FeaturePointToSurface::
+unsigned int& FeaturePointToSurfaceDistance::
 getDimension( unsigned int & dim, int /*time*/ )
 {
   dim = 1;
@@ -100,7 +100,7 @@ getDimension( unsigned int & dim, int /*time*/ )
 /** Compute the interaction matrix from a subset of
  * the possible features.
  */
-int & FeaturePointToSurface::
+int & FeaturePointToSurfaceDistance::
 oneStepOfControl( int& dummy,int time )
 {
   sotDEBUG(15)<<"# In {"<<endl;
@@ -128,7 +128,7 @@ oneStepOfControl( int& dummy,int time )
 }
 
 
-ml::Matrix& FeaturePointToSurface::
+ml::Matrix& FeaturePointToSurfaceDistance::
 computeJacobian( ml::Matrix& J,int time )
 {
   sotDEBUG(15)<<"# In {"<<endl;
@@ -143,7 +143,7 @@ computeJacobian( ml::Matrix& J,int time )
 *a the possible features.
  */
 ml::Vector&
-FeaturePointToSurface::computeError( ml::Vector& res,int time )
+FeaturePointToSurfaceDistance::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
   double reference = referenceSIN(time);

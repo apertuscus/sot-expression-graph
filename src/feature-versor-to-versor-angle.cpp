@@ -40,7 +40,7 @@ using namespace dynamicgraph;
 using namespace KDL;
 using namespace std;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureVersorToVersor,"FeatureVersorToVersor");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureVersorToVersor,"FeatureVersorToVersorAngle");
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
