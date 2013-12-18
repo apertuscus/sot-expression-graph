@@ -9,8 +9,6 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 SET(CONTROLLER_NAME expression_graph)
 ADD_LIBRARY(${CONTROLLER_NAME}
   SHARED
-  feature-expressionGraph.cpp
-  feature-expressionFullGraph.cpp
   feature-expr-graph-abstract.cpp
 
   feature-line-to-line-distance.cpp
