@@ -43,22 +43,30 @@ namespace geometric_primitive
 {
 using namespace KDL;
 
+
 struct Point
 {
+	//! \brief origin of the point
 	Expression<KDL::Frame>::Ptr o;
+	//! \brief position of the point, in the frame o
 	Expression<KDL::Vector>::Ptr p;
 };
 
 //no check done on versor in building up
 struct Versor
 {
+	//! \brief frame
 	Expression<Frame>::Ptr o;
+	//! \brief versor (aka normed vector), expressed in the frame o
 	Expression<Vector>::Ptr v;
 };
 struct Line
 {
+	//! \brief origin of the point
 	Expression<Frame>::Ptr o;
+	//! \brief dir?
 	Expression<Vector>::Ptr dir;
+	//! \brief pos?
 	Expression<Vector>::Ptr p;
 };
 

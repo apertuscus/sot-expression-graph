@@ -65,7 +65,8 @@ Expression<Vector>::Ptr ExpressDirectionInBase(const Line & l)
 	return rotation(l.o)*l.dir;
 }
 using namespace KDL;
-/*for all the expressions we soppose that the frames are expressed in a common reference*/
+
+/*for all the expressions we suppose that the frames are expressed in a common reference*/
 Expression<double>::Ptr point_point_distance(const Point & p1,const Point &  p2)
 {
 	Expression<Vector>::Ptr v1=ExpressInBase(p1);
