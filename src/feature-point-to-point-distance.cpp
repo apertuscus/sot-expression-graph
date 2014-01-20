@@ -140,7 +140,6 @@ FeaturePointToPointDistance::computeError( ml::Vector& res,int time )
   res.resize(1);
   //evaluate the result.
   res(0) = Soutput_->value() - reference;
-  std::cout << getName() << "  " << res(0) << std::endl;
   sotDEBUGOUT(15);
   return res ;
 }
