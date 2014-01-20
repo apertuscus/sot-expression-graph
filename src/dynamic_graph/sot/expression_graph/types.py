@@ -2,8 +2,6 @@ from dynamic_graph import plug
 from dynamic_graph.sot.expression_graph.expression_graph import *
 from dynamic_graph.sot.dyninv import  TaskInequality
 from dynamic_graph.sot.core import *
-from dynamic_graph.sot.core.meta_task_generic import MetaTaskGeneric
-
 
 class BaseElement:
 	name = None
