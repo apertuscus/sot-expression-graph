@@ -9,10 +9,10 @@ class BaseElement:
 	name = None
 	ref_frame =None
 	typename   = ""
+	frames = {}
+	frames['ground'] = ((1,0,0,0), (0,1,0,0), (0,0,1,0), (0,0,0,1))
 
 	def __init__(self, name, robot, ref_frame_name):
-		self.frames = {}
-		self.frames['ground'] = ((1,0,0,0), (0,1,0,0), (0,0,1,0), (0,0,0,1))
 		try :
 			print 'using robot.frames['+ref_frame_name+']'
 			self.ref_frame = robot.frames[ref_frame_name]
