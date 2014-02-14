@@ -52,7 +52,7 @@ FeaturePointToLinePrj( const string& name )
 , p1_SIN( NULL,"FeaturePointToLinePrj("+name+")::input(vector)::p1" )
 , p2_SIN( NULL,"FeaturePointToLinePrj("+name+")::input(vector)::p2" )
 , dir2_SIN( NULL,"FeaturePointToLinePrj("+name+")::input(vector)::dir2" )
-, referenceSIN( NULL,"FeaturePointToLinePrj("+name+")::input(double)::reference" )
+, referenceSIN( NULL,"FeaturePointToLinePrj("+name+")::input(vector)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
@@ -143,13 +143,13 @@ ml::Vector&
 FeaturePointToLinePrj::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
-  double reference = referenceSIN(time);
+  const ml::Vector & reference = referenceSIN(time);
 
   updateInputValues(Soutput_, time);
 
   res.resize(1);
   //evaluate the result.
-  res(0) = Soutput_->value() - reference;
+  res(0) = Soutput_->value() - reference(0);
 
   sotDEBUGOUT(15);
   return res ;

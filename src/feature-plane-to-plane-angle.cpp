@@ -53,7 +53,7 @@ FeaturePlaneToPlaneAngle( const string& name )
 , p2_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::p2" )
 , norm1_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::norm1" )
 , norm2_SIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::norm2" )
-, referenceSIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(double)::reference" )
+, referenceSIN( NULL,"FeatureAnglesBtwPlanes("+name+")::input(vector)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( p1_SIN );
@@ -153,12 +153,12 @@ ml::Vector&
 FeaturePlaneToPlaneAngle::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
-  double reference = referenceSIN(time);
+  const ml::Vector & reference = referenceSIN(time);
   updateInputValues(Soutput_, time);
 
   res.resize(1);
   //evaluate the result.
-  res(0) = Soutput_->value() - reference;
+  res(0) = Soutput_->value() - reference(0);
 
   sotDEBUGOUT(15);
   return res ;

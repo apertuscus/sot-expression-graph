@@ -91,7 +91,7 @@ public:
   dg::SignalPtr< ml::Vector,int > dir2_SIN;
 
   // reference
-  dg::SignalPtr< double,int > referenceSIN;
+  dg::SignalPtr< ml::Vector,int > referenceSIN;
 
 private:
   virtual void updateInputValues(KDL::Expression<double>::Ptr Soutput, int time);

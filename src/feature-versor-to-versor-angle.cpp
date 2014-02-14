@@ -51,7 +51,7 @@ FeatureVersorToVersor( const string& name )
 : FeatureExprGraphAbstract( name )
 , v1_SIN( NULL,"FeatureVersorToVersor("+name+")::input(vector)::v1" )
 , v2_SIN( NULL,"FeatureVersorToVersor("+name+")::input(vector)::v2" )
-, referenceSIN( NULL,"FeatureVersorToVersor("+name+")::input(double)::reference" )
+, referenceSIN( NULL,"FeatureVersorToVersor("+name+")::input(vector)::reference" )
 {
   //the Jacobian depends by
   jacobianSOUT.addDependency( v1_SIN );
@@ -140,7 +140,7 @@ ml::Vector&
 FeatureVersorToVersor::computeError( ml::Vector& res,int time )
 {
   sotDEBUGIN(15);
-  double reference = referenceSIN(time);
+  const ml::Vector & reference = referenceSIN(time);
   updateInputValues(Soutput_, time);
 
   res.resize(1);

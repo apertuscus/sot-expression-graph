@@ -85,7 +85,7 @@ public:
   dg::SignalPtr< ml::Vector,int > normalSIN;
 
   // reference
-  dg::SignalPtr< double,int > referenceSIN;
+  dg::SignalPtr< ml::Vector,int > referenceSIN;
 
 // internal data (to avoid memory allocation)
 private:
