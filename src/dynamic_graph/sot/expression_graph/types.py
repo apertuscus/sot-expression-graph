@@ -12,16 +12,12 @@ class BaseElement:
 
 	def __init__(self, name, robot, ref_frame_name):
 		try :
-			print 'using robot.frames['+ref_frame_name+']'
 			self.ref_frame = robot.frames[ref_frame_name]
-			print 'using robot.frames['+ref_frame_name+']'
 		except:
 			try:
 				self.ref_frame = robot.features[ref_frame_name]
-				print 'using robot.features['+ref_frame_name+']'
 			except:
 				self.ref_frame = self.frames[ref_frame_name]
-				print 'using frames['+ref_frame_name+']'
 		self.name = name
 
 
