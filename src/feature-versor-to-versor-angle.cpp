@@ -149,7 +149,7 @@ FeatureVersorToVersor::computeError( ml::Vector& res,int time )
   if (isnan(res(0)))
     res(0)=0;
 
-  res(0) -= reference;
+  res(0) -= cos(reference(0));
   sotDEBUGOUT(15);
   return res ;
 }

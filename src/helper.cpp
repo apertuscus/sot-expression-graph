@@ -134,7 +134,8 @@ Expression<double>::Ptr angle_btw_versors (const Versor & v1, const Versor& v2)
 {
 	Expression<Vector>::Ptr vrs1=ExpressInBase(v1);
 	Expression<Vector>::Ptr vrs2=ExpressInBase(v2);
-	return KDL::acos(dot(vrs1,vrs2));
+	//return KDL::acos(dot(vrs1,vrs2));
+	return dot(vrs1,vrs2);
 }
 Expression<double>::Ptr angle_btw_planes (const Plane & pl1, const Plane & pl2)
 {
