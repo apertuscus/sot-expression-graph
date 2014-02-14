@@ -47,7 +47,7 @@ def createFeaturePlaneVersorAngle(name, elmt1, elmt2):
 	assert elmt1.typename == 'plane'
 	assert elmt2.typename == 'versor'
 
-	feature = FeaturePlaneToVersorAngle(name)
+	feature = FeaturePlaneToVersorAngle('robot_feature_' + name)
 
 	# Get the position/Jacobian of the operational point for the dynamic entity
 	plugOperationalPoint(feature, '1', elmt1)
@@ -58,7 +58,7 @@ def createFeaturePlaneVersorAngle(name, elmt1, elmt2):
 	plugOperationalPoint(feature, '2', elmt2)
 	plugSignalOrValue(elmt2.versor, feature.v2)
 
-	feature.reference.value = 0
+	feature.reference.value = (0,)
 
 	return feature
 
@@ -67,7 +67,7 @@ def createFeatureVersorVersorAngle(name, elmt1, elmt2):
 	assert elmt1.typename == 'versor'
 	assert elmt2.typename == 'versor'
 
-	feature = FeatureVersorToVersorAngle(name)
+	feature = FeatureVersorToVersorAngle('robot_feature_' + name)
 
 	# Get the position/Jacobian of the operational point for the dynamic entity
 	plugOperationalPoint(feature, '1', elmt1)
@@ -77,7 +77,7 @@ def createFeatureVersorVersorAngle(name, elmt1, elmt2):
 	plugOperationalPoint(feature, '2', elmt2)
 	plugSignalOrValue(elmt2.versor, feature.v2)
 
-	feature.reference.value = 0
+	feature.reference.value = (0,)
 
 	return feature
 
@@ -86,7 +86,7 @@ def createFeaturePointPointDistance(name, elmt1, elmt2):
 	assert elmt1.typename == 'point'
 	assert elmt2.typename == 'point'
 
-	feature = FeaturePointToPointDistance(name)
+	feature = FeaturePointToPointDistance('robot_feature_' + name)
 
 	# Get the position/Jacobian of the operational point for the dynamic entity
 	plugOperationalPoint(feature, '1', elmt1)
@@ -103,7 +103,7 @@ def createFeaturePointToPoint(name, elmt1, elmt2):
 	assert elmt1.typename == 'point'
 	assert elmt2.typename == 'point'
 
-	feature = FeaturePointToPoint(name)
+	feature = FeaturePointToPoint('robot_feature_' + name)
 
 	# Get the position/Jacobian of the operational point for the dynamic entity
 	plugOperationalPoint(feature, '1', elmt1)
@@ -115,18 +115,35 @@ def createFeaturePointToPoint(name, elmt1, elmt2):
 
 	return feature
 
+# Create a feature between two homogeneous matrices
+#def createFeatureHomoToHomo(name, elmt1, elmt2):
+#	assert elmt1.typename == 'point'
+#	assert elmt2.typename == 'point'
+#
+#	feature    = Feature6D('robot_feature_' + name)
+#	featureDes = Feature6D('robot_feature_' + name)
+
+	# Get the position/Jacobian of the operational point for the dynamic entity
+	#plugOperationalPoint(feature, '1', elmt1)
+	#plugSignalOrValue(elmt1.position, feature.p1)
+
+	#ground frame
+	#plugOperationalPoint(feature, '2', elmt2)
+	#plugSignalOrValue(elmt2.position, feature.p2)
+
+#	return feature
 
 
-def createTask(name, feature, equality):
+def createTaskInternal(name, feature, equality):
 	# Define a equality task
 	if equality:
-		task = Task('robot_task_'+name)
+		task = Task(name)
 		task.controlGain.value = 1
 
 	# Define a inequality task
 	else:
-		dt = 0.005
-		task = TaskInequality('robot_task_'+name)
+		dt = 0.005 #todo
+		task = TaskInequality(name)
 		task.dt.value=dt
 		task.controlGain.value = 1 * dt
 	task.add(feature.name)
@@ -139,7 +156,7 @@ def createTask(name, feature, equality):
 def createTaskAndFeaturePointToPoint(name, elmt1, elmt2, equality=True):
 
 	feature = createFeaturePointToPoint(name, elmt1, elmt2)
-	task = createTask(name, feature, equality)
+	task = createTaskInternal(name, feature, equality)
 	return (task, feature)
 
 """
@@ -183,9 +200,87 @@ def createTaskAndFeature(name, elmt1, elmt2, operation, equality=True):
 		else:
 			raise TypeError('Unable to compute the angle between ' + elmt1.typename  + '/' + elmt2.typename)
 
+	elif operation == 'position':
+		# point / point
+		if elmt1.typename == 'point' and elmt2.typename == 'point':
+			feature = createFeaturePointToPoint(name, elmt1, elmt2)
+		else:
+			raise TypeError('Unable to compute the angle between ' + elmt1.typename  + '/' + elmt2.typename)
+
 	else:
 			raise TypeError("operation " +  operation + " unknown")
 
-	task = createTask(name, feature, equality)
+	task = createTaskInternal(name, feature, equality)
 	return (task, feature)
+
+
+""" 
+insert an expression into the associated dictionnary of the robot structure 
+assume the global robot entity is defined.
+"""
+def createExpression(robot, expr):
+  if expr.name in robot.expressions:
+    # print "expression " + expr.name + " already exists"
+    # print robot.expressions[expr.name]
+    return
+  else:
+    robot.expressions[expr.name] = expr
+
+
+""" 
+create and store the task/feature, 
+if it does not exist in the repository
+"""
+def createTask(robot, name, expr1, expr2, taskType, lowerBound, upperBound, gain=1):
+  if name in robot.tasks:
+#    print "task " + name + " already exists"
+    return
+
+  (task, feature) = \
+    createTaskAndFeature(name, robot.expressions[expr1], robot.expressions[expr2],\
+     taskType, lowerBound == upperBound)
+  #TODO?
+  feature.dim.recompute(1)
+  dim = feature.dim.value
+  if(lowerBound == upperBound):
+#    if dim == 1:
+#      feature.reference.value = lowerBound[0]
+#    else:
+    feature.reference.value = lowerBound
+  else:
+#    if dim == 1:
+#      feature.reference.value = 0
+#    else:
+    feature.reference.value = (0,) * dim
+    task.referenceInf.value = lowerBound
+    task.referenceSup.value = upperBound
+  task.gain = gain
+
+  # setting the desired position.
+  robot.tasks[name] = task
+  robot.features[name] = feature
+
+
+"""
+
+"""
+def setTaskGoal(robot, name, lower, upper, selec):
+  if name in robot.tasks and name in robot.features:
+#    robot.features[name].dim.recompute(1)
+#    dim = robot.features[name].dim.value
+    if lower == upper:
+#      if dim == 1:
+#        robot.features[name].reference.value = lower[0]
+#      else:
+      robot.features[name].reference.value = lower
+    else:
+      robot.features[name].reference.value = (0,) *len(lower)
+      robot.tasks[name].referenceInf.value = lower
+      robot.tasks[name].referenceSup.value = upper
+
+    if selec != '':
+      robot.features[name].selec.value = selec
+  else:
+    print "task " + name + " does not exists"
+    
 
