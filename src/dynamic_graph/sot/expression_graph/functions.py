@@ -115,25 +115,8 @@ def createFeaturePointToPoint(name, elmt1, elmt2):
 
 	return feature
 
-# Create a feature between two homogeneous matrices
-#def createFeatureHomoToHomo(name, elmt1, elmt2):
-#	assert elmt1.typename == 'point'
-#	assert elmt2.typename == 'point'
-#
-#	feature    = Feature6D('robot_feature_' + name)
-#	featureDes = Feature6D('robot_feature_' + name)
 
-	# Get the position/Jacobian of the operational point for the dynamic entity
-	#plugOperationalPoint(feature, '1', elmt1)
-	#plugSignalOrValue(elmt1.position, feature.p1)
-
-	#ground frame
-	#plugOperationalPoint(feature, '2', elmt2)
-	#plugSignalOrValue(elmt2.position, feature.p2)
-
-#	return feature
-
-
+""" Create a task entity """
 def createTaskInternal(name, feature, equality):
 	# Define a equality task
 	if equality:
@@ -220,8 +203,6 @@ assume the global robot entity is defined.
 """
 def createExpression(robot, expr):
   if expr.name in robot.expressions:
-    # print "expression " + expr.name + " already exists"
-    # print robot.expressions[expr.name]
     return
   else:
     robot.expressions[expr.name] = expr
@@ -233,7 +214,6 @@ if it does not exist in the repository
 """
 def createTask(robot, name, expr1, expr2, taskType, lowerBound, upperBound, gain=1):
   if name in robot.tasks:
-#    print "task " + name + " already exists"
     return
 
   (task, feature) = \
@@ -243,14 +223,8 @@ def createTask(robot, name, expr1, expr2, taskType, lowerBound, upperBound, gain
   feature.dim.recompute(1)
   dim = feature.dim.value
   if(lowerBound == upperBound):
-#    if dim == 1:
-#      feature.reference.value = lowerBound[0]
-#    else:
     feature.reference.value = lowerBound
   else:
-#    if dim == 1:
-#      feature.reference.value = 0
-#    else:
     feature.reference.value = (0,) * dim
     task.referenceInf.value = lowerBound
     task.referenceSup.value = upperBound
@@ -266,12 +240,7 @@ def createTask(robot, name, expr1, expr2, taskType, lowerBound, upperBound, gain
 """
 def setTaskGoal(robot, name, lower, upper, selec):
   if name in robot.tasks and name in robot.features:
-#    robot.features[name].dim.recompute(1)
-#    dim = robot.features[name].dim.value
     if lower == upper:
-#      if dim == 1:
-#        robot.features[name].reference.value = lower[0]
-#      else:
       robot.features[name].reference.value = lower
     else:
       robot.features[name].reference.value = (0,) *len(lower)
