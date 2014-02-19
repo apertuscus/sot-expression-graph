@@ -1,8 +1,6 @@
 import roslib
 import rospy
-import tf
 import numpy
-
 
 
 ## Create the robot and the solver. only useful to test the whole system.
@@ -54,37 +52,20 @@ for name,joint in [ ['LF','left-ankle'], ['RF','right-ankle' ] ]:
 # Create the FeatureExpressionGraph and the corresponding task
 from dynamic_graph import plug
 from dynamic_graph.sot.core import *
-from dynamic_graph.sot.expression_graph.expression_graph import *
-
-expg = FeatureExpressionGraph('expg')
-expg.displaySignals()
-
-
-# Define a task
-taskExpg = Task('taskExpg')
-
-#define the gain
-taskExpg.controlGain.value = 1
-
-# operational point used
-opPoint1 = 'left-wrist' 
-opPoint2 = 'right-wrist'
-# Get the positions/Jacobians of the operational points for the dynamic entity
-plug(robot.dynamic.signal(opPoint1),expg.signal('w_T_o1'))
-plug(robot.dynamic.signal('J'+opPoint1),expg.signal('w_J_o1'))
-plug(robot.dynamic.signal(opPoint2),expg.signal('w_T_o2'))
-plug(robot.dynamic.signal('J'+opPoint2),expg.signal('w_J_o2'))
-
-# Associate the feature to the task:
-taskExpg.add(expg.name)
+from dynamic_graph.sot.expression_graph.functions import *
+from dynamic_graph.sot.expression_graph.types import *
+robot.expressions = {}
+createExpression(robot, PointElement('left-wrist', robot, 'left-wrist', position=(0,0,0)))
+createExpression(robot, PointElement('right-wrist', robot, 'right-wrist', position=(0,0,0)))
+createTask(robot, 'dist', 'left-wrist', 'right-wrist', 'distance', (0,), (0,))
 
 #desired value
-expg.positionRef.value = 0.1 
+robot.features['dist'].reference.value = (0.1,)
 
 # add the task corresponding to the expression graph.
 # note that the contacts have already been added (to have having a flying robot).
-solver.push(taskExpg)
+solver.push(robot.tasks['dist'])
 
-expg.displaySignals()
+robot.tasks['dist'].displaySignals()
 #type 'go'
 
