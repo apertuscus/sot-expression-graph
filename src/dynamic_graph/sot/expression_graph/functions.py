@@ -128,7 +128,7 @@ def createTaskInternal(name, feature, equality):
 		dt = 0.005 #todo
 		task = TaskInequality(name)
 		task.dt.value=dt
-		task.controlGain.value = 1 * dt
+		task.controlGain.value = task.dt.value
 	task.add(feature.name)
 
 	return task
@@ -238,7 +238,7 @@ def createTask(robot, name, expr1, expr2, taskType, lowerBound, upperBound, gain
 """
 
 """
-def setTaskGoal(robot, name, lower, upper, selec):
+def setTaskGoal(robot, name, lower, upper, selec = '', gain = ()):
   if name in robot.tasks and name in robot.features:
     if lower == upper:
       robot.features[name].reference.value = lower
@@ -247,8 +247,25 @@ def setTaskGoal(robot, name, lower, upper, selec):
       robot.tasks[name].referenceInf.value = lower
       robot.tasks[name].referenceSup.value = upper
 
+    # Fill the selec value
     if selec != '':
       robot.features[name].selec.value = selec
+
+    coeff = 1
+    if robot.tasks[name].className == 'TaskInequality':
+      coeff = robot.tasks[name].dt.value
+
+    # If the gain vector is provided, fill it.
+    if gain != []:
+      if len(gain) == 1:
+        robot.tasks[name].controlGain.value = gain(0)*coeff
+      elif len(gain) == 3:
+        gain = GainAdaptive('gain_'+name)
+        gain.set(gain(0)*coeff,gain(1)*coeff,gain(2))
+        plug(robot.tasks[name].error, gain.error)
+        plug(gain.gain, robot.tasks[name].controlGain)
+      # otherwise do not modify the gain
+
   else:
     print "task " + name + " does not exists"
     
