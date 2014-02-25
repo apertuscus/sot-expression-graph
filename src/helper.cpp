@@ -149,5 +149,16 @@ Expression<double>::Ptr angle_btw_plane_and_versor (const Plane & pl, const Vers
 	Expression<Vector>::Ptr vrs2=ExpressInBase(v);
 	return Constant<double>(PI/2)-acos(dot(vrs2,vrs1));
 }
-
+Expression<double>::Ptr angle_btw_line_and_point (const Line & l1, const Point& p2)
+{
+	Expression<Vector>::Ptr w_p2=ExpressInBase(p2);
+	Expression<Vector>::Ptr w_p1=ExpressOriginInBase(l1);
+	Expression<Vector>::Ptr w_v1=ExpressDirectionInBase(l1);
+	//vector from p1 to p2
+	Expression<Vector>::Ptr w_p12=w_p2-w_p1;
+	//versor from p1 to p2
+	Expression<Vector>::Ptr w_v12=w_p12*(Constant(1.0)/norm(w_p12));
+	//versor from p1 to p2
+	return dot(w_v1,w_v12);
+}
 }

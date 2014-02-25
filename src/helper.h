@@ -77,7 +77,10 @@ struct Plane
 	Expression<Vector>::Ptr p;
 };
 
-/*for all the expressions we soppose that the frames are expressed in a common reference*/
+/* for all the expressions,
+ *  we suppose that the frames are expressed
+ *  in a common reference
+ *  */
 Expression<double>::Ptr point_point_distance(const Point & p1,const Point& p2);
 Expression<KDL::Vector>::Ptr point_point_difference(const Point & p1, const Point & p2);
 Expression<double>::Ptr line_point_distance(const Point&  p, const Line& l);
@@ -85,17 +88,15 @@ Expression<double>::Ptr projection_of_point_on_line(const Point& p, const Line& 
 Expression<double>::Ptr line_line_distance (const Line& l1, const Line& l2);
 Expression<double>::Ptr surface_point_distance(const Point & p, const Plane & plan);
 
- /* Expression<double>::Ptr distance_o1_f1 (line l1, line l2);
- * Expression<double>::Ptr distance_o2_f2 (line l1, line l2);
- *
+
 //angles
- * Expression<double>::Ptr angle_btw_versors (versor v1, versor v2);
- * Expression<double>::Ptr incident_angle (versor v, plane pl);
- * Expression<double>::Ptr angles_btw_planes (plane pl1, plane pl2);
- * */
+
 Expression<double>::Ptr angle_btw_planes (const Plane & pl1, const Plane & pl2);
 Expression<double>::Ptr angle_btw_versors (const Versor & v1, const Versor& v2);
 Expression<double>::Ptr angle_btw_plane_and_versor (const Plane & p, const Versor& v);
+/*This function computes the angle btw
+ * the direction of the line and the versor that goes from line1.p to point2.p*/
+Expression<double>::Ptr angle_btw_line_and_point (const Line & line1, const Point& point2);
 
 //helper functions
 Expression<Vector>::Ptr ExpressInBase(const Point & p);
