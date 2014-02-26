@@ -237,31 +237,39 @@ def createTask(robot, name, expr1, expr2, taskType, lowerBound, upperBound, gain
 
 """
 
+lower: lower bound of the task,
+upper: upper bound of the task,  # leave both lower and upper empty for no modification
+selec: selection of the dof considered   # leave empty for no modification
+gain:  gain # leave empty for no modification
 """
 def setTaskGoal(robot, name, lower, upper, selec = '', gain = ()):
   if name in robot.tasks and name in robot.features:
-    if lower == upper:
-      robot.features[name].reference.value = lower
-    else:
-      robot.features[name].reference.value = (0,) *len(lower)
-      robot.tasks[name].referenceInf.value = lower
-      robot.tasks[name].referenceSup.value = upper
+    # Modification of the goal
+    if lower != [] and upper != []:
+      if lower == upper:
+        robot.features[name].reference.value = lower
+      else:
+        robot.features[name].reference.value = (0,) *len(lower)
+        robot.tasks[name].referenceInf.value = lower
+        robot.tasks[name].referenceSup.value = upper
 
     # Fill the selec value
     if selec != '':
       robot.features[name].selec.value = selec
 
-    coeff = 1
-    if robot.tasks[name].className == 'TaskInequality':
-      coeff = robot.tasks[name].dt.value
-
-    # If the gain vector is provided, fill it.
+  # If the gain vector is provided, fill it.
+  if name in robot.tasks:
     if gain != []:
+      # damping factor for the gain
+      coeff = 1
+      if robot.tasks[name].className == 'TaskInequality':
+        coeff = robot.tasks[name].dt.value
+
       if len(gain) == 1:
-        robot.tasks[name].controlGain.value = gain(0)*coeff
+        robot.tasks[name].controlGain.value = gain[0]*coeff
       elif len(gain) == 3:
         gain = GainAdaptive('gain_'+name)
-        gain.set(gain(0)*coeff,gain(1)*coeff,gain(2))
+        gain.set(gain[0]*coeff,gain[1]*coeff,gain[2])
         plug(robot.tasks[name].error, gain.error)
         plug(gain.gain, robot.tasks[name].controlGain)
       # otherwise do not modify the gain
