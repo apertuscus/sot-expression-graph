@@ -7,6 +7,9 @@ class BaseElement:
 	name = None
 	ref_frame =None
 	typename   = ""
+
+	# Database of fixed elemts of the environment
+	#  Can contain transformations (numerical values) or output signals of transformation
 	frames = {}
 	frames['ground'] = ((1,0,0,0), (0,1,0,0), (0,0,1,0), (0,0,0,1))
 
