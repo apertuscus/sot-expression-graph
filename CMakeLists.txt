@@ -34,7 +34,6 @@ ADD_REQUIRED_DEPENDENCY("sot-core >= 2.7")
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 ADD_ROSPACK_DEPENDENCY("expressiongraph")
-ADD_ROSPACK_DEPENDENCY("expressiongraph_tf")
 
 # Search for dependencies.
 # Boost

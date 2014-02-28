@@ -4,8 +4,7 @@ INCLUDE(../cmake/python.cmake)
 FINDPYTHON()
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
-# Add the library to wrap the controller of HRP4.
-
+# Add the features
 SET(CONTROLLER_NAME expression_graph)
 ADD_LIBRARY(${CONTROLLER_NAME}
   SHARED
@@ -32,7 +31,6 @@ PKG_CONFIG_USE_DEPENDENCY(${CONTROLLER_NAME} "dynamic-graph-python")
 PKG_CONFIG_USE_DEPENDENCY(${CONTROLLER_NAME} "sot-core")
 #external package in ros packages
 ROSPACK_USE_DEPENDENCY(${CONTROLLER_NAME} "expressiongraph")
-ROSPACK_USE_DEPENDENCY(${CONTROLLER_NAME} "expressiongraph_tf")
 
 
 IF(UNIX AND NOT APPLE)
